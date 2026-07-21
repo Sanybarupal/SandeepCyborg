@@ -1,0 +1,10 @@
+# Phase 1 Requirements
+PySide6>=6.5.0
+SQLAlchemy>=2.0.0
+# For Whisper STT (Mock for now, but will use openai package)
+openai>=1.0.0
+# For ElevenLabs TTS
+elevenlabs>=0.2.0
+# For OS specific stuff
+pywin32>=306; sys_platform == 'win32'
+python-dotenv>=1.0.0
