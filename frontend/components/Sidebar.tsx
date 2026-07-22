@@ -3,11 +3,12 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import ThemeToggle from './ThemeToggle'
 
 const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : '')
 
 const navItems = [
-  { href: '/',           icon: '⚡',  label: 'Dashboard'  },
+  { href: '/dashboard',  icon: '⚡',  label: 'Dashboard'  },
   { href: '/clients',    icon: '👥',  label: 'Clients'    },
   { href: '/chat',       icon: '💬',  label: 'AI Chat'    },
   { href: '/approvals',  icon: '✅',  label: 'Approvals', badge: true },
@@ -61,9 +62,12 @@ export default function Sidebar() {
       {/* Mobile Header */}
       <div className="mobile-header">
         <div className="mobile-logo">⚡ Sandeep Clone</div>
-        <button className="hamburger-btn" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? '✕' : '☰'}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <ThemeToggle />
+          <button className="hamburger-btn" onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? '✕' : '☰'}
+          </button>
+        </div>
       </div>
 
       {/* Overlay */}
@@ -77,10 +81,11 @@ export default function Sidebar() {
         <div className="sidebar-logo">
           <div className="sidebar-logo-text">⚡ Sandeep Clone</div>
           <div className="sidebar-logo-sub">AI Operating System v1.0</div>
-          <div style={{ marginTop: '10px' }}>
+          <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span className={`ai-mode-badge ${aiMode === 'gpt4' ? 'ai-mode-gpt4' : 'ai-mode-mock'}`}>
               {aiMode === 'gpt4' ? '🟢 GPT-4 Live' : '🟡 Mock Mode'}
             </span>
+            <ThemeToggle />
           </div>
         </div>
 
