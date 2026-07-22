@@ -2,6 +2,10 @@
 Sandeep Clone — FastAPI Backend Main Entry Point
 Run: uvicorn main:app --reload --port 8000
 """
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config import APP_NAME, VERSION, FRONTEND_URL, AI_MOCK_MODE

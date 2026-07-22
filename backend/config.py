@@ -11,8 +11,10 @@ VERSION = "1.0.0"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 
-# ─── Database ──────────────────────────────────────
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sandeep_ai.db")
+if "VERCEL" in os.environ and "DATABASE_URL" not in os.environ:
+    DATABASE_URL = "sqlite:////tmp/sandeep_ai.db"
+else:
+    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sandeep_ai.db")
 
 # ─── AI Settings ───────────────────────────────────
 AI_MODEL = os.getenv("AI_MODEL", "gpt-4o")
