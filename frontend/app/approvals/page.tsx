@@ -14,6 +14,7 @@ interface Approval {
   priority: string
   client_id: number | null
   created_at: string
+  reviewed_at?: string
 }
 
 const TYPE_ICONS: Record<string, string> = {
