@@ -189,7 +189,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Two Column Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20 }}>
+      <div className="dashboard-grid">
         {/* Recent Clients */}
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
