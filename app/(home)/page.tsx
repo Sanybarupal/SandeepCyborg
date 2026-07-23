@@ -1,81 +1,108 @@
 import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
-
-const FEATURES = [
-  'Client Management',
-  'WhatsApp Automation',
-  'AI Chat Assistant',
-  'Voice Assistant',
-  'Approval System',
-  'Knowledge Base',
-  'Website Builder',
-  'Business Automation'
-]
-
-const MODULES = [
-  { href: '/dashboard', icon: '⚡', title: 'Dashboard', desc: 'Overview of all your business stats and activities.' },
-  { href: '/clients', icon: '👥', title: 'Clients', desc: 'Manage leads, projects, and client relationships.' },
-  { href: '/chat', icon: '💬', title: 'AI Chat', desc: 'Interact with your personalized AI assistant.' },
-  { href: '/approvals', icon: '✅', title: 'Approvals', desc: 'Review and approve pending system actions.' },
-  { href: '/upload', icon: '📂', title: 'Upload', desc: 'Upload documents and update your Knowledge Base.' },
-  { href: '#', icon: '🎤', title: 'Voice', desc: 'Voice commands and interactions (Phase 3).' },
-  { href: '#', icon: '🌐', title: 'Web Builder', desc: 'Create and manage websites automatically (Phase 4).' },
-  { href: '#', icon: '⚙️', title: 'Settings', desc: 'Configure your AI Operating System preferences.' }
-]
+import Image from 'next/image'
 
 export default function HomePage() {
   return (
-    <div className="home-page animate-in">
-      {/* 3D Sphere Background Animation */}
-      <div className="sphere-container">
-        <div className="sphere"></div>
-      </div>
-
-      <header className="home-header">
-        <div className="home-logo">⚡ Sandeep Clone</div>
-        <ThemeToggle />
+    <div className="landing-page animate-in">
+      <header className="landing-header">
+        <div className="landing-logo">
+          <span className="logo-icon">⚡</span> Sandeep Clone
+        </div>
+        <nav className="landing-nav">
+          <Link href="/dashboard">DASHBOARD</Link>
+          <Link href="/clients">CLIENTS</Link>
+          <Link href="/chat">AI CHAT</Link>
+          <Link href="/upload">KNOWLEDGE BASE</Link>
+        </nav>
+        <div className="header-actions">
+          <ThemeToggle />
+          <Link href="/dashboard" className="btn-get-started">
+            OPEN SYSTEM ↗
+          </Link>
+        </div>
       </header>
 
-      <main className="home-content">
-        <h1 className="home-title">Welcome to Sandeep Clone</h1>
-        <div style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px', color: 'var(--purple-light)' }}>
-          AI Operating System
-        </div>
-        <p className="home-subtitle">
-          Your Personal AI Assistant for Business Automation
-        </p>
-
-        <div className="overview-list">
-          {FEATURES.map((feature, i) => (
-            <div key={i} className="overview-pill">
-              • {feature}
+      <main className="landing-main">
+        <div className="hero-section">
+          {/* Left Floater */}
+          <div className="floater left-floater glass-panel">
+            <div className="floater-content">
+              <span className="floater-title">Plan</span>
             </div>
-          ))}
-        </div>
+            <div className="corner top-left"></div>
+            <div className="corner top-right"></div>
+            <div className="corner bottom-left"></div>
+            <div className="corner bottom-right"></div>
+          </div>
 
-        <div className="quick-actions">
-          <Link href="/dashboard" className="btn btn-primary btn-lg">
-            Open Dashboard
-          </Link>
-          <Link href="/chat" className="btn btn-success btn-lg">
-            Start AI
-          </Link>
-          <Link href="/clients/new" className="btn btn-ghost btn-lg">
-            New Project
-          </Link>
-          <Link href="/upload" className="btn btn-ghost btn-lg">
-            Upload Files
-          </Link>
-        </div>
+          {/* Right Floater */}
+          <div className="floater right-floater glass-panel">
+            <div className="rating">
+              <span className="score">4.9</span>
+              <span className="star">★</span>
+            </div>
+            <span className="reviews-text">Reviews</span>
+            <div className="mini-astronaut">
+              👨‍🚀
+            </div>
+          </div>
 
-        <div className="home-grid">
-          {MODULES.map((mod, i) => (
-            <Link key={i} href={mod.href} className="home-card">
-              <div className="home-card-icon">{mod.icon}</div>
-              <div className="home-card-title">{mod.title}</div>
-              <div className="home-card-desc">{mod.desc}</div>
+          <div className="cyborg-container">
+            <Image 
+              src="/cyborg_portrait.png" 
+              alt="Cyborg AI" 
+              width={400} 
+              height={400} 
+              className="cyborg-image floating"
+              priority
+            />
+          </div>
+
+          <div className="hero-text-container">
+            <h1 className="hero-heading">
+              Welcome to Sandeep Clone
+            </h1>
+            <h2 className="hero-subheading">AI Operating System</h2>
+          </div>
+
+          <div className="hero-actions">
+            <div className="circle-badge glass-panel">
+              <div className="badge-logo">⚡ AI OS</div>
+              <div className="badge-text">AI Driven<br/>Automation</div>
+            </div>
+            
+            <Link href="/chat" className="btn-start-large">
+              Get Started
             </Link>
-          ))}
+
+            <div className="hero-right-text">
+              WHERE ARTIFICIAL<br/>INTELLIGENCE MEETS<br/>BUSINESS AUTOMATION
+            </div>
+          </div>
+        </div>
+
+        <div className="bottom-panel glass-panel">
+          <div className="panel-col">
+            <h3 className="panel-title">
+              <span className="highlight">AI</span> Driven Precision
+            </h3>
+            <p className="panel-desc">
+              Smart automation and intelligent insights designed to support better business decisions.
+            </p>
+          </div>
+          <div className="panel-col">
+            <h2 className="panel-main-title">Built for the Future of Business</h2>
+            <p className="panel-main-desc">
+              A next-generation business ecosystem where technology and humanity work together seamlessly.
+            </p>
+            <Link href="/dashboard" className="panel-link">
+              EXPERIENCE THE FUTURE
+            </Link>
+          </div>
+          <div className="panel-col astronaut-col">
+            <div className="large-astronaut">⚡</div>
+          </div>
         </div>
       </main>
     </div>
