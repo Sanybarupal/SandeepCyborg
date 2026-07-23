@@ -71,11 +71,33 @@ export default function VoiceAssistant() {
   const speak = (text: string) => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text)
-      utterance.rate = 1.1
-      utterance.pitch = 1
+      
+      // Try to find a more natural/human voice (e.g. Google or Microsoft natural voices)
+      const voices = window.speechSynthesis.getVoices()
+      // Fallback to finding male English voices which tend to sound closer to the desired outcome
+      let selectedVoice = voices.find(v => v.name.includes('Google UK English Male') || v.name.includes('Google US English'))
+      if (!selectedVoice) {
+        selectedVoice = voices.find(v => v.name.includes('Natural') || v.name.includes('Neural'))
+      }
+      
+      if (selectedVoice) {
+        utterance.voice = selectedVoice
+      }
+
+      utterance.rate = 1.05 // Slightly faster for natural feel
+      utterance.pitch = 0.9 // Slightly lower pitch for deeper male voice
       window.speechSynthesis.speak(utterance)
     }
   }
+
+  // Ensure voices are loaded (sometimes takes a moment on page load)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices()
+      }
+    }
+  }, [])
 
   const toggleListening = (forceState?: boolean) => {
     const newState = forceState !== undefined ? forceState : !isListening

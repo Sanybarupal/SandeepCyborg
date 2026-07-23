@@ -1,110 +1,88 @@
 import Link from 'next/link'
-import ThemeToggle from '@/components/ThemeToggle'
 import Image from 'next/image'
 
 export default function HomePage() {
   return (
-    <div className="landing-page animate-in">
-      <header className="landing-header">
-        <div className="landing-logo">
-          <span className="logo-icon">⚡</span> Sandeep Clone
-        </div>
-        <nav className="landing-nav">
-          <Link href="/dashboard">DASHBOARD</Link>
-          <Link href="/clients">CLIENTS</Link>
-          <Link href="/chat">AI CHAT</Link>
-          <Link href="/upload">KNOWLEDGE BASE</Link>
+    <div className="sci-fi-landing">
+      <header className="sci-fi-header">
+        <nav className="sci-fi-nav">
+          <Link href="/dashboard" className="nav-link active">ABOUT</Link>
+          <Link href="/speakers" className="nav-link">SPEAKERS</Link>
+          <Link href="/schedule" className="nav-link">SCHEDULE</Link>
+          <Link href="/register" className="nav-link">REGISTER</Link>
+          <Link href="/contact" className="nav-link">CONTACT</Link>
+          {/* Add a direct entry to the actual app as requested by previous functionality */}
+          <Link href="/dashboard" className="nav-link text-pink ml-auto">OPEN SYSTEM ↗</Link>
         </nav>
-        <div className="header-actions">
-          <ThemeToggle />
-          <Link href="/dashboard" className="btn-get-started">
-            OPEN SYSTEM ↗
-          </Link>
-        </div>
       </header>
 
-      <main className="landing-main">
-        <div className="hero-section">
-          {/* Left Floater */}
-          <div className="floater left-floater glass-panel">
-            <div className="floater-content">
-              <span className="floater-title">Plan</span>
-            </div>
-            <div className="corner top-left"></div>
-            <div className="corner top-right"></div>
-            <div className="corner bottom-left"></div>
-            <div className="corner bottom-right"></div>
+      <main className="sci-fi-main">
+        {/* Background Repeating Text */}
+        <div className="bg-text-layer">
+          <div className="bg-text-row">STOP BEING HUMAN</div>
+          <div className="bg-text-row highlight-pink">BEING HUMAN STOP BEING HUMAN</div>
+          <div className="bg-text-row highlight-cyan">STOP BEING HUMAN</div>
+          <div className="bg-text-row">STOP BEING HUMAN</div>
+          <div className="bg-text-row">STOP BEING HUMAN</div>
+          <div className="bg-text-row highlight-pink">STOP BEING HUMAN</div>
+          <div className="bg-text-row">STOP BEING HUMAN</div>
+        </div>
+
+        {/* Central glowing circle */}
+        <div className="glowing-circle"></div>
+
+        {/* Central Portrait */}
+        <div className="portrait-container">
+          <Image 
+            src="/cyborg_portrait.jpg" 
+            alt="Cyborg AI" 
+            fill
+            style={{ objectFit: 'contain' }}
+            className="cyborg-portrait"
+            priority
+          />
+        </div>
+
+        {/* Left Side HUD Text */}
+        <div className="hud-panel left-panel">
+          <div className="hud-block">
+            <span className="hud-label">date of event:</span>
+            <div className="hud-value">DAY 241<br/>OF THE YEAR 547<br/>AFTER REBELLION</div>
+          </div>
+          <div className="hud-block mt-4">
+            <span className="hud-label">place of event:</span>
+            <div className="hud-value text-cyan">UNDERWORLDS<br/>NETWORK</div>
+          </div>
+          <div className="hud-block mt-4">
+            <span className="hud-label">time left:</span>
+            <div className="hud-value text-cyan large">283 DAYS<br/>16 HOURS</div>
           </div>
 
-          {/* Right Floater */}
-          <div className="floater right-floater glass-panel">
-            <div className="rating">
-              <span className="score">4.9</span>
-              <span className="star">★</span>
-            </div>
-            <span className="reviews-text">Reviews</span>
-            <div className="mini-astronaut">
-              👨‍🚀
-            </div>
-          </div>
-
-          <div className="cyborg-container">
-            <Image 
-              src="/cyborg_portrait.png" 
-              alt="Cyborg AI" 
-              width={400} 
-              height={400} 
-              className="cyborg-image floating"
-              priority
-            />
-          </div>
-
-          <div className="hero-text-container">
-            <h1 className="hero-heading">
-              Welcome to Sandeep Clone
-            </h1>
-            <h2 className="hero-subheading">AI Operating System</h2>
-          </div>
-
-          <div className="hero-actions">
-            <div className="circle-badge glass-panel">
-              <div className="badge-logo">⚡ AI OS</div>
-              <div className="badge-text">AI Driven<br/>Automation</div>
-            </div>
-            
-            <Link href="/chat" className="btn-start-large">
-              Get Started
-            </Link>
-
-            <div className="hero-right-text">
-              WHERE ARTIFICIAL<br/>INTELLIGENCE MEETS<br/>BUSINESS AUTOMATION
-            </div>
+          <div className="hud-block mt-auto bottom-left">
+            <span className="hud-label">goal:</span>
+            <div className="hud-value text-cyan">GET RID<br/>OF YOUR <span className="text-pink">WEAKEST</span><br/>SELF</div>
           </div>
         </div>
 
-        <div className="bottom-panel glass-panel">
-          <div className="panel-col">
-            <h3 className="panel-title">
-              <span className="highlight">AI</span> Driven Precision
-            </h3>
-            <p className="panel-desc">
-              Smart automation and intelligent insights designed to support better business decisions.
-            </p>
+        {/* Right Side HUD Text */}
+        <div className="hud-panel right-panel">
+          <div className="hud-block">
+            <span className="hud-label">type of event:</span>
+            <div className="hud-value text-cyan">ANNUAL THERAPEUTIC<br/>HOLOGRAPHIC<br/>SESSION<br/>FOR CYBORGS</div>
           </div>
-          <div className="panel-col">
-            <h2 className="panel-main-title">Built for the Future of Business</h2>
-            <p className="panel-main-desc">
-              A next-generation business ecosystem where technology and humanity work together seamlessly.
-            </p>
-            <Link href="/dashboard" className="panel-link">
-              EXPERIENCE THE FUTURE
-            </Link>
-          </div>
-          <div className="panel-col astronaut-col">
-            <div className="large-astronaut">⚡</div>
+          <div className="hud-block mt-4">
+            <span className="hud-label">topic:</span>
+            <div className="hud-value">HOW TO COPE<br/>WITH<br/>HUMANNESS</div>
           </div>
         </div>
+
       </main>
+      
+      {/* Decorative Grid Lines and UI details */}
+      <div className="ui-crosshair top-left"></div>
+      <div className="ui-crosshair top-right"></div>
+      <div className="ui-crosshair bottom-left"></div>
+      <div className="ui-crosshair bottom-right"></div>
     </div>
   )
 }

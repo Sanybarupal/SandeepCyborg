@@ -3,59 +3,59 @@
    Dark Premium AI Dashboard
 ═══════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
 
 /* ─── CSS Variables (Design Tokens) ─────────────────────── */
 :root {
-  /* Colors */
-  --bg-base:       #030303;
-  --bg-surface:    #0a0a0a;
-  --bg-elevated:   #111111;
-  --bg-card:       rgba(15, 15, 15, 0.6);
-  --bg-card-hover: rgba(25, 25, 25, 0.8);
+  /* Colors - SciFi Theme */
+  --bg-base:       #0a0514; /* Deep purple/space background */
+  --bg-surface:    #15082e;
+  --bg-elevated:   #231045;
+  --bg-card:       rgba(21, 8, 46, 0.6);
+  --bg-card-hover: rgba(35, 16, 69, 0.8);
 
-  --border:        rgba(255,255,255,0.05);
-  --border-active: rgba(255, 107, 0, 0.4);
+  --border:        rgba(224, 34, 255, 0.2);
+  --border-active: rgba(0, 238, 255, 0.5);
 
-  /* Brand Colors */
-  --purple:        #ff6b00; /* Reusing var names but changing to warm */
-  --purple-light:  #ff8c33;
-  --purple-dark:   #cc5500;
-  --cyan:          #ffb703;
-  --cyan-light:    #ffd166;
-  --pink:          #ef233c;
-  --green:         #10b981;
-  --orange:        #fb8500;
-  --red:           #d90429;
+  /* Brand Colors - Neon Pink & Cyan */
+  --purple:        #e022ff; /* Neon pink/purple */
+  --purple-light:  #f07cff;
+  --purple-dark:   #9600af;
+  --cyan:          #00eeff; /* Neon cyan */
+  --cyan-light:    #7bffff;
+  --pink:          #ff2a7a;
+  --green:         #00ff9d;
+  --orange:        #ff6b00;
+  --red:           #ff2a2a;
 
   /* Gradients */
-  --grad-purple:   linear-gradient(135deg, #ff6b00, #fb8500);
-  --grad-cyan:     linear-gradient(135deg, #fb8500, #ffb703);
-  --grad-brand:    linear-gradient(135deg, #ff6b00 0%, #ffb703 100%);
-  --grad-card:     linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  --grad-purple:   linear-gradient(135deg, #e022ff, #00eeff);
+  --grad-cyan:     linear-gradient(135deg, #00eeff, #ff2a7a);
+  --grad-brand:    linear-gradient(135deg, #e022ff 0%, #00eeff 100%);
+  --grad-card:     linear-gradient(145deg, rgba(224,34,255,0.05), rgba(0,238,255,0.02));
 
   /* Text */
   --text-primary:   #ffffff;
-  --text-secondary: #a3a3a3;
-  --text-muted:     #737373;
-  --text-accent:    #ff8c33;
+  --text-secondary: #c9bcf0;
+  --text-muted:     #8778b4;
+  --text-accent:    #00eeff;
 
   /* Glow Effects */
-  --glow-purple:   0 0 30px rgba(255, 107, 0, 0.25);
-  --glow-cyan:     0 0 30px rgba(255, 183, 3, 0.2);
-  --glow-card:     0 8px 32px rgba(0,0,0,0.6);
-  --glow-bg-color: rgba(255, 107, 0, 0.15);
+  --glow-purple:   0 0 30px rgba(224, 34, 255, 0.35);
+  --glow-cyan:     0 0 30px rgba(0, 238, 255, 0.3);
+  --glow-card:     0 8px 32px rgba(224,34,255,0.15);
+  --glow-bg-color: rgba(224, 34, 255, 0.2);
 
   /* Sizing */
   --sidebar-width: 260px;
   --header-height: 64px;
-  --radius-sm:  8px;
-  --radius-md:  12px;
-  --radius-lg:  16px;
-  --radius-xl:  24px;
+  --radius-sm:  4px; /* Sharper borders for sci-fi */
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
 
   /* Transitions */
-  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 [data-theme='light'] {
@@ -91,13 +91,18 @@ html {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Rajdhani', -apple-system, sans-serif;
   background: var(--bg-base);
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .page-title, .stat-number, .sidebar-logo-text {
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────── */
@@ -1279,3 +1284,168 @@ tbody tr:last-child td { border-bottom: none; }
   .bottom-panel { flex-direction: column; gap: 30px; padding: 20px; text-align: center; }
   .astronaut-col { justify-content: center; }
 }
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap");
+
+/* --- Sci-Fi Landing Page ---------------------------------- */
+.sci-fi-landing {
+  min-height: 100vh;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  position: relative;
+  overflow: hidden;
+  font-family: "Rajdhani", sans-serif;
+}
+
+.sci-fi-header {
+  padding: 30px 50px;
+  position: relative;
+  z-index: 10;
+}
+
+.sci-fi-nav {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  font-family: "Orbitron", sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.nav-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--cyan);
+  text-shadow: var(--glow-cyan);
+}
+
+.text-pink { color: var(--pink) !important; }
+.text-cyan { color: var(--cyan) !important; }
+.ml-auto { margin-left: auto; }
+
+.sci-fi-main {
+  position: relative;
+  height: calc(100vh - 100px);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 50px;
+}
+
+/* Background Repeating Text */
+.bg-text-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150vw;
+  text-align: center;
+  z-index: 1;
+  opacity: 0.15;
+  font-family: "Orbitron", sans-serif;
+  font-size: 8vw;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -2px;
+  pointer-events: none;
+}
+
+.bg-text-row.highlight-pink { color: var(--pink); text-shadow: var(--glow-purple); opacity: 0.8; }
+.bg-text-row.highlight-cyan { color: var(--cyan); text-shadow: var(--glow-cyan); opacity: 0.8; }
+
+/* Glowing Circle */
+.glowing-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60vh;
+  height: 60vh;
+  border-radius: 50%;
+  border: 4px solid var(--cyan);
+  box-shadow: 0 0 50px var(--cyan), inset 0 0 50px var(--cyan);
+  z-index: 2;
+  opacity: 0.6;
+}
+
+.glowing-circle::after {
+  content: "";
+  position: absolute;
+  top: -10px; right: -10px; bottom: -10px; left: -10px;
+  border-radius: 50%;
+  border: 4px solid var(--pink);
+  box-shadow: 0 0 50px var(--pink), inset 0 0 50px var(--pink);
+  transform: scale(1.05);
+  opacity: 0.4;
+  animation: pulse-glow 3s infinite alternate;
+}
+
+/* Central Portrait */
+.portrait-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -45%);
+  width: 50vw;
+  height: 80vh;
+  z-index: 5;
+}
+
+/* HUD Panels */
+.hud-panel {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+  padding-top: 50px;
+}
+
+.left-panel { text-align: left; }
+.right-panel { text-align: right; margin-left: auto; }
+
+.hud-block {
+  margin-bottom: 30px;
+}
+.hud-block.bottom-left {
+  margin-top: auto;
+  margin-bottom: 50px;
+}
+
+.hud-label {
+  display: block;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+
+.hud-value {
+  font-family: "Orbitron", sans-serif;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.hud-value.large {
+  font-size: 28px;
+  text-shadow: var(--glow-cyan);
+}
+
+.mt-4 { margin-top: 40px; }
+.mt-auto { margin-top: auto; }
+
+/* UI Crosshairs */
+.ui-crosshair {
+  position: absolute;
+  width: 20px; height: 20px;
+  border: 1px solid var(--text-muted);
+  z-index: 10;
+}
+.ui-crosshair.top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+.ui-crosshair.top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+.ui-crosshair.bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+.ui-crosshair.bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+
