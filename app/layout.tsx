@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import VoiceAssistant from '@/components/VoiceAssistant'
 
 export const metadata: Metadata = {
   title: 'Sandeep Clone — AI Operating System',
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           {children}
+          <VoiceAssistant />
         </ThemeProvider>
       </body>
     </html>

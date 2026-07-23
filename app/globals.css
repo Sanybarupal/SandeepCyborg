@@ -1269,3 +1269,13 @@ tbody tr:last-child td { border-bottom: none; }
   filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
 }
 
+
+@media (max-width: 768px) {
+  .landing-header { flex-direction: column; gap: 20px; padding: 20px; }
+  .landing-nav { flex-direction: column; gap: 10px; display: none; }
+  .hero-heading { font-size: 40px; }
+  .hero-actions { flex-direction: column; gap: 30px; margin-top: 40px; }
+  .floater { display: none; }
+  .bottom-panel { flex-direction: column; gap: 30px; padding: 20px; text-align: center; }
+  .astronaut-col { justify-content: center; }
+}

@@ -227,17 +227,36 @@ function ChatInner() {
             </span>
           </div>
         </div>
-        <button
-          className="btn btn-ghost btn-sm"
-          onClick={() => { 
-            setMessages([{ role: 'ai', content: 'Namaste! Nayi chat shuru karein.' }]); 
-            setSessionId(null);
-            setSelectedClientId(null);
-            setClientDetails(null);
-          }}
-        >
-          + Nayi Chat
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={async () => {
+              try {
+                const res = await fetch(`${API}/api/whatsapp/sync-chats`, { method: 'POST' })
+                if (res.ok) {
+                  const data = await res.json()
+                  alert(`Synced ${data.synced_count} WhatsApp mock chats!`)
+                  fetchSessions() // Refresh chats
+                }
+              } catch {
+                alert('Failed to sync WhatsApp chats.')
+              }
+            }}
+          >
+            🔄 Sync WhatsApp
+          </button>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => { 
+              setMessages([{ role: 'ai', content: 'Namaste! Nayi chat shuru karein.' }]); 
+              setSessionId(null);
+              setSelectedClientId(null);
+              setClientDetails(null);
+            }}
+          >
+            + Nayi Chat
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>

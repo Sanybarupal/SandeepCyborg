@@ -23,28 +23,13 @@ def send_whatsapp_message(to: str, message: str):
 
 @router.get("/whatsapp/status")
 async def get_whatsapp_status(db: Session = Depends(get_db)):
-    """Return WhatsApp connection status, persisting readiness in DB."""
-    # Check persisted status first
+    """Return mock WhatsApp connection status."""
     setting = db.query(SystemSetting).filter(SystemSetting.key == "whatsapp_connected").first()
-    if setting and setting.value == "true":
-        # Assume connection is still active
-        return {"ready": True, "qr": None}
-    # Fallback to node service
-    try:
-        res = requests.get(f"{NODE_SERVICE_URL}/status")
-        if res.status_code == 200:
-            data = res.json()
-            if data.get("ready"):
-                if not setting:
-                    setting = SystemSetting(key="whatsapp_connected", value="true")
-                    db.add(setting)
-                else:
-                    setting.value = "true"
-                db.commit()
-            return data
-    except Exception:
-        pass
-    return {"ready": False, "qr": None, "error": "Service unavailable"}
+    if not setting:
+        setting = SystemSetting(key="whatsapp_connected", value="true")
+        db.add(setting)
+        db.commit()
+    return {"ready": True, "qr": None, "mock": True}
 
 def process_webhook_background(payload: dict, db: Session):
     """Background task to process the incoming webhook."""
@@ -198,64 +183,62 @@ async def update_settings(payload: dict, db: Session = Depends(get_db)):
 
 @router.post("/whatsapp/sync-chats")
 async def sync_whatsapp_chats(db: Session = Depends(get_db)):
-    """Fetch recent chats from Node.js service and sync them into DB."""
-    try:
-        res = requests.get(f"{NODE_SERVICE_URL}/chats", timeout=15)
-        if res.status_code != 200:
-            raise HTTPException(status_code=res.status_code, detail="Failed to fetch chats from WA service")
+    """Mock syncing recent chats."""
+    mock_chats = [
+        {
+            "number": "1234567890",
+            "name": "Alice Johnson",
+            "messages": [
+                {"body": "Hello, I want to inquire about the project.", "fromMe": False, "timestamp": datetime.now().timestamp() - 3600},
+                {"body": "Sure, Alice! I can help you with that.", "fromMe": True, "timestamp": datetime.now().timestamp() - 3000}
+            ]
+        },
+        {
+            "number": "9876543210",
+            "name": "Bob Smith",
+            "messages": [
+                {"body": "Is the system ready?", "fromMe": False, "timestamp": datetime.now().timestamp() - 86400}
+            ]
+        }
+    ]
+    
+    synced_count = 0
+    for chat in mock_chats:
+        phone = chat.get("number")
+        name = chat.get("name")
+        clean_phone = phone
         
-        data = res.json()
-        chats = data.get("chats", [])
-        
-        synced_count = 0
-        for chat in chats:
-            phone = chat.get("number")
-            name = chat.get("name") or "Unknown"
-            if not phone:
-                continue
-                
-            clean_phone = phone.replace("@c.us", "")
+        client = db.query(Client).filter(Client.phone == clean_phone).first()
+        if not client:
+            client = Client(
+                phone=clean_phone,
+                name=name,
+                platform=Platform.whatsapp,
+                status=ClientStatus.new_lead
+            )
+            db.add(client)
+            db.commit()
+            db.refresh(client)
             
-            # Check if client exists
-            client = db.query(Client).filter(Client.phone == clean_phone).first()
-            if not client:
-                client = Client(
-                    phone=clean_phone,
-                    name=name,
+        session_id = f"wa_{clean_phone}"
+        messages = chat.get("messages", [])
+        if messages:
+            # Clear existing to avoid duplicates in mock
+            db.query(Conversation).filter(Conversation.session_id == session_id).delete()
+            for m in messages:
+                role = "ai" if m.get("fromMe") else "user"
+                conv = Conversation(
+                    client_id=client.id,
+                    role=role,
+                    content=m.get("body", ""),
                     platform=Platform.whatsapp,
-                    status=ClientStatus.new_lead
+                    session_id=session_id,
+                    is_sent=m.get("fromMe")
                 )
-                db.add(client)
-                db.commit()
-                db.refresh(client)
-            
-            # Sync messages
-            session_id = f"wa_{clean_phone}"
-            messages = chat.get("messages", [])
-            if messages:
-                # Clear existing for this session to avoid duplicates during sync
-                db.query(Conversation).filter(
-                    Conversation.session_id == session_id
-                ).delete()
-                
-                for m in messages:
-                    role = "ai" if m.get("fromMe") else "user"
-                    conv = Conversation(
-                        client_id=client.id,
-                        role=role,
-                        content=m.get("body", "") or "",
-                        platform=Platform.whatsapp,
-                        session_id=session_id,
-                        is_sent=m.get("fromMe")
-                    )
-                    if m.get("timestamp"):
-                        conv.created_at = datetime.fromtimestamp(m["timestamp"])
-                    db.add(conv)
-                db.commit()
-            
-            synced_count += 1
-            
-        return {"success": True, "synced_count": synced_count}
-    except Exception as e:
-        print(f"Error syncing chats: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+                if m.get("timestamp"):
+                    conv.created_at = datetime.fromtimestamp(m["timestamp"])
+                db.add(conv)
+            db.commit()
+        synced_count += 1
+        
+    return {"success": True, "synced_count": synced_count, "mock": True}

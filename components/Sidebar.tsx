@@ -115,21 +115,18 @@ export default function Sidebar() {
 
           <div className="nav-section-title" style={{ marginTop: '24px' }}>System</div>
 
-          <div className="nav-item" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
-            <span>📱</span>
-            <span>WhatsApp</span>
-            <span style={{ fontSize: '10px', marginLeft: 'auto', color: 'var(--text-muted)' }}>Phase 2</span>
-          </div>
-          <div className="nav-item" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+          <Link href="/voice" className={`nav-item ${pathname === '/voice' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
             <span>🎤</span>
-            <span>Voice</span>
-            <span style={{ fontSize: '10px', marginLeft: 'auto', color: 'var(--text-muted)' }}>Phase 3</span>
-          </div>
-          <div className="nav-item" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+            <span>Voice Assistant</span>
+          </Link>
+          <Link href="/website-builder" className={`nav-item ${pathname === '/website-builder' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
             <span>🌐</span>
             <span>Web Builder</span>
-            <span style={{ fontSize: '10px', marginLeft: 'auto', color: 'var(--text-muted)' }}>Phase 4</span>
-          </div>
+          </Link>
+          <Link href="/settings" className={`nav-item ${pathname === '/settings' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>
+            <span>⚙️</span>
+            <span>Settings</span>
+          </Link>
         </nav>
 
         {/* Bottom Status */}
