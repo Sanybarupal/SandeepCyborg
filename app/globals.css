@@ -1449,3 +1449,237 @@ tbody tr:last-child td { border-bottom: none; }
 .ui-crosshair.bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
 .ui-crosshair.bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
 
+
+/* --- Network Landing Page ---------------------------------- */
+.network-landing {
+  min-height: 100vh;
+  background-color: #161616;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  font-family: "Inter", sans-serif;
+}
+
+/* Header */
+.network-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  height: 60px;
+  background: #161616;
+  border-bottom: 1px solid #333;
+}
+
+.brand-block {
+  background-color: #ffffff;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+}
+
+.network-nav {
+  display: flex;
+  align-items: center;
+}
+
+.network-nav .nav-link {
+  color: #aaaaaa;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0 25px;
+  letter-spacing: 1px;
+  transition: color 0.2s ease;
+  border-left: 1px solid #333;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.network-nav .nav-link:hover {
+  color: #ffffff;
+}
+
+.btn-demo {
+  background-color: #ff4500;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0 30px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+.btn-demo:hover {
+  background-color: #e03e00;
+}
+
+/* Hero Section */
+.network-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60px;
+  text-align: center;
+}
+
+.hero-text-container {
+  z-index: 10;
+  margin-bottom: 40px;
+}
+
+.kicker {
+  color: #ff4500;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin-bottom: 15px;
+}
+
+.main-heading {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  letter-spacing: -1px;
+}
+
+.sub-heading {
+  font-size: 14px;
+  color: #888888;
+  line-height: 1.6;
+}
+
+/* Network Diagram */
+.network-diagram {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Orbits */
+.orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+}
+
+.orbit-1 { width: 300px; height: 180px; }
+.orbit-2 { width: 550px; height: 320px; }
+.orbit-3 { width: 800px; height: 460px; }
+
+/* Central Node */
+.central-node {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background: #000;
+  border: 2px solid #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+  box-shadow: 0 0 40px rgba(255, 69, 0, 0.2);
+}
+
+.central-icon {
+  color: #ff4500;
+  font-size: 40px;
+}
+
+/* Orbiting Nodes */
+.node {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  color: #fff;
+  z-index: 15;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  transform: translate(-50%, -50%);
+}
+
+.bg-green { background: linear-gradient(135deg, #25D366, #128C7E); }
+.bg-blue { background: linear-gradient(135deg, #1877F2, #0C5ECA); }
+.bg-light-blue { background: linear-gradient(135deg, #00d8ff, #00a3cc); }
+.bg-black { background: #000; border: 1px solid #333; }
+.bg-orange { background: linear-gradient(135deg, #F05032, #D93B1F); }
+.bg-blue-dark { background: linear-gradient(135deg, #3776AB, #23547D); }
+.bg-green-dark { background: linear-gradient(135deg, #339933, #236B23); }
+.bg-cyan { background: linear-gradient(135deg, #1DA1F2, #0E71AA); }
+.bg-purple { background: linear-gradient(135deg, #8A2BE2, #4B0082); font-size: 14px; font-weight: 700; }
+.bg-pink { background: linear-gradient(135deg, #FF69B4, #C71585); font-size: 14px; font-weight: 700; }
+
+/* Positioning Nodes along orbits manually for simplicity */
+/* Inner Orbit */
+.node-1 { top: calc(50% - 90px); left: 50%; } /* Top */
+.node-2 { top: calc(50% + 90px); left: 50%; } /* Bottom */
+.node-3 { top: 50%; left: calc(50% - 150px); } /* Left */
+.node-4 { top: 50%; left: calc(50% + 150px); } /* Right */
+
+/* Middle Orbit */
+.node-5 { top: calc(50% - 110px); left: calc(50% - 190px); }
+.node-6 { top: calc(50% - 110px); left: calc(50% + 190px); }
+.node-7 { top: calc(50% + 110px); left: calc(50% - 190px); }
+.node-8 { top: calc(50% + 110px); left: calc(50% + 190px); }
+
+/* Outer Orbit */
+.node-9 { top: calc(50% - 160px); left: calc(50% - 280px); }
+.node-10 { top: calc(50% - 160px); left: calc(50% + 280px); }
+.node-11 { top: calc(50% + 160px); left: calc(50% - 280px); }
+.node-12 { top: calc(50% + 160px); left: calc(50% + 280px); }
+
+/* Decorative Background Glow */
+.network-diagram::before {
+  content: "";
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(255, 69, 0, 0.15) 0%, rgba(0,0,0,0) 70%);
+  z-index: 1;
+}
+
+/* Network Labels */
+.network-label {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #888;
+  z-index: 20;
+}
+
+.network-label .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff4500;
+  box-shadow: 0 0 5px #ff4500;
+}
+
+.label-1 { top: 60%; left: calc(50% + 220px); }
+.label-2 { top: 40%; left: calc(50% + 320px); }
+

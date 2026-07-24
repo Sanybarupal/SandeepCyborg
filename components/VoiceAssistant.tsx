@@ -43,7 +43,12 @@ export default function VoiceAssistant() {
     }
   }, [isListening])
 
-  const handleVoiceCommand = (command: string) => {
+  const handleVoiceCommand = async (command: string) => {
+    if (command.includes('hi sandeep') || command.includes('hi saibo') || command.includes('hello sandeep')) {
+      speak('Hello sir. How can I assist you with your business today?')
+      return
+    }
+    
     if (command.includes('open dashboard')) {
       speak('Opening dashboard')
       router.push('/dashboard')
@@ -65,6 +70,17 @@ export default function VoiceAssistant() {
     } else if (command.includes('stop listening')) {
       speak('Voice assistant paused')
       toggleListening(false)
+    } else {
+      // Simulate passing to an LLM
+      console.log('Sending to AI backend:', command)
+      // Normally, here we would fetch from our /api/chat backend.
+      // For now, if we don't recognize a command, we give a default AI response:
+      if (command.length > 5 && !command.includes('sandeep') && !command.includes('saibo')) {
+         speak('I am processing your request. Please wait.')
+         setTimeout(() => {
+            speak('I have recorded your command.')
+         }, 2000)
+      }
     }
   }
 
@@ -104,7 +120,7 @@ export default function VoiceAssistant() {
     setIsListening(newState)
     
     if (newState) {
-      speak('Voice assistant activated. I am listening.')
+      speak('Voice assistant ready, I am Sandeep Saibo.')
       try {
         recognitionRef.current?.start()
       } catch (e) {}

@@ -1,88 +1,80 @@
 import Link from 'next/link'
-import Image from 'next/image'
+import { FaWhatsapp, FaFacebook, FaTwitter, FaGithub, FaGitAlt, FaReact, FaNodeJs, FaPython } from 'react-icons/fa'
+import { SiVercel, SiNextdotjs } from 'react-icons/si'
+import { BsCpu } from 'react-icons/bs'
 
 export default function HomePage() {
   return (
-    <div className="sci-fi-landing">
-      <header className="sci-fi-header">
-        <nav className="sci-fi-nav">
-          <Link href="/dashboard" className="nav-link active">ABOUT</Link>
-          <Link href="/speakers" className="nav-link">SPEAKERS</Link>
-          <Link href="/schedule" className="nav-link">SCHEDULE</Link>
-          <Link href="/register" className="nav-link">REGISTER</Link>
-          <Link href="/contact" className="nav-link">CONTACT</Link>
-          {/* Add a direct entry to the actual app as requested by previous functionality */}
-          <Link href="/dashboard" className="nav-link text-pink ml-auto">OPEN SYSTEM ↗</Link>
+    <div className="network-landing">
+      {/* Header matching the image */}
+      <header className="network-header">
+        <div className="brand-block">
+          <span className="brand-text">Sandeep Clone</span>
+        </div>
+        <nav className="network-nav">
+          <Link href="/dashboard" className="nav-link">DASHBOARD</Link>
+          <Link href="/clients" className="nav-link">CLIENTS</Link>
+          <Link href="/chat" className="nav-link">AI CHAT</Link>
+          <Link href="/upload" className="nav-link">UPLOAD</Link>
+          <Link href="/settings" className="nav-link">SETTINGS</Link>
+          <Link href="/dashboard" className="btn-demo">OPEN SYSTEM</Link>
         </nav>
       </header>
 
-      <main className="sci-fi-main">
-        {/* Background Repeating Text */}
-        <div className="bg-text-layer">
-          <div className="bg-text-row">STOP BEING HUMAN</div>
-          <div className="bg-text-row highlight-pink">BEING HUMAN STOP BEING HUMAN</div>
-          <div className="bg-text-row highlight-cyan">STOP BEING HUMAN</div>
-          <div className="bg-text-row">STOP BEING HUMAN</div>
-          <div className="bg-text-row">STOP BEING HUMAN</div>
-          <div className="bg-text-row highlight-pink">STOP BEING HUMAN</div>
-          <div className="bg-text-row">STOP BEING HUMAN</div>
+      <main className="network-main">
+        {/* Hero Text */}
+        <div className="hero-text-container">
+          <div className="kicker">INTEGRATIONS</div>
+          <h1 className="main-heading">Built on the largest network of AI interfaces</h1>
+          <p className="sub-heading">
+            When a new workflow is optimized by a user on any Sandeep-enabled device,
+            <br />
+            every other connected process is instantly accelerated.
+          </p>
         </div>
 
-        {/* Central glowing circle */}
-        <div className="glowing-circle"></div>
+        {/* Network Diagram */}
+        <div className="network-diagram">
+          {/* Orbit Rings */}
+          <div className="orbit orbit-1"></div>
+          <div className="orbit orbit-2"></div>
+          <div className="orbit orbit-3"></div>
 
-        {/* Central Portrait */}
-        <div className="portrait-container">
-          <Image 
-            src="/cyborg_portrait.jpg" 
-            alt="Cyborg AI" 
-            fill
-            style={{ objectFit: 'contain' }}
-            className="cyborg-portrait"
-            priority
-          />
-        </div>
-
-        {/* Left Side HUD Text */}
-        <div className="hud-panel left-panel">
-          <div className="hud-block">
-            <span className="hud-label">date of event:</span>
-            <div className="hud-value">DAY 241<br/>OF THE YEAR 547<br/>AFTER REBELLION</div>
-          </div>
-          <div className="hud-block mt-4">
-            <span className="hud-label">place of event:</span>
-            <div className="hud-value text-cyan">UNDERWORLDS<br/>NETWORK</div>
-          </div>
-          <div className="hud-block mt-4">
-            <span className="hud-label">time left:</span>
-            <div className="hud-value text-cyan large">283 DAYS<br/>16 HOURS</div>
+          {/* Central Node */}
+          <div className="central-node">
+            <BsCpu className="central-icon" />
           </div>
 
-          <div className="hud-block mt-auto bottom-left">
-            <span className="hud-label">goal:</span>
-            <div className="hud-value text-cyan">GET RID<br/>OF YOUR <span className="text-pink">WEAKEST</span><br/>SELF</div>
-          </div>
-        </div>
+          {/* Connected Nodes */}
+          {/* Inner Orbit (Orbit 1) */}
+          <div className="node node-1 bg-green"><FaWhatsapp /></div>
+          <div className="node node-2 bg-blue"><FaFacebook /></div>
+          <div className="node node-3 bg-light-blue"><FaReact /></div>
+          <div className="node node-4 bg-black"><SiNextdotjs /></div>
 
-        {/* Right Side HUD Text */}
-        <div className="hud-panel right-panel">
-          <div className="hud-block">
-            <span className="hud-label">type of event:</span>
-            <div className="hud-value text-cyan">ANNUAL THERAPEUTIC<br/>HOLOGRAPHIC<br/>SESSION<br/>FOR CYBORGS</div>
+          {/* Middle Orbit (Orbit 2) */}
+          <div className="node node-5 bg-black"><FaGithub /></div>
+          <div className="node node-6 bg-orange"><FaGitAlt /></div>
+          <div className="node node-7 bg-blue-dark"><FaPython /></div>
+          <div className="node node-8 bg-green-dark"><FaNodeJs /></div>
+
+          {/* Outer Orbit (Orbit 3) */}
+          <div className="node node-9 bg-black"><SiVercel /></div>
+          <div className="node node-10 bg-cyan"><FaTwitter /></div>
+          <div className="node node-11 bg-purple">AI</div>
+          <div className="node node-12 bg-pink">DB</div>
+
+          {/* Optional connecting lines/labels */}
+          <div className="network-label label-1">
+            <div className="dot"></div>
+            Data Flow
           </div>
-          <div className="hud-block mt-4">
-            <span className="hud-label">topic:</span>
-            <div className="hud-value">HOW TO COPE<br/>WITH<br/>HUMANNESS</div>
+          <div className="network-label label-2">
+            <div className="dot"></div>
+            Protocols
           </div>
         </div>
-
       </main>
-      
-      {/* Decorative Grid Lines and UI details */}
-      <div className="ui-crosshair top-left"></div>
-      <div className="ui-crosshair top-right"></div>
-      <div className="ui-crosshair bottom-left"></div>
-      <div className="ui-crosshair bottom-right"></div>
     </div>
   )
 }
