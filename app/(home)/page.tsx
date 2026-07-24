@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { FaWhatsapp, FaGithub, FaReact, FaNodeJs, FaDatabase } from 'react-icons/fa'
-import { SiVercel, SiOpenai } from 'react-icons/si'
-import { BsCpu, BsGrid1X2, BsPeople, BsChatText, BsCloudUpload, BsGear, BsMoon, BsBell, BsPlayCircle, BsMic, BsShieldCheck, BsFolder2Open } from 'react-icons/bs'
-import { TbCodeCircle, TbActivity, TbMessageCircle2, TbBolt, TbBox, TbWorldWww } from 'react-icons/tb'
+import { SiVercel } from 'react-icons/si'
+import { BsCpu, BsGrid1X2, BsPeople, BsChatText, BsCloudUpload, BsGear, BsMoon, BsBell, BsPlayCircle, BsMic, BsShieldCheck, BsFolder2Open, BsRobot } from 'react-icons/bs'
+import { TbCodeCircle, TbActivity, TbBolt, TbBox, TbWorldWww } from 'react-icons/tb'
 import Image from 'next/image'
 
 export default function HomePage() {
@@ -154,7 +154,7 @@ export default function HomePage() {
               </div>
 
               <div className="orbit-node-c pos-aimodels-c">
-                <div className="icon-box-c bg-purple-c"><SiOpenai /></div>
+                <div className="icon-box-c bg-purple-c"><BsRobot /></div>
                 <div className="node-info-c">
                   <span className="node-title-c">AI Models</span>
                   <span className="node-sub-c">OpenAI</span>
@@ -267,7 +267,7 @@ export default function HomePage() {
 
          <div className="data-card">
            <div className="data-card-top">
-             <div className="data-card-icon circle-purple-c"><TbMessageCircle2 /></div>
+             <div className="data-card-icon circle-purple-c"><BsChatText /></div>
              <div className="data-card-stats">
                <div className="d-val">3,562</div>
                <div className="d-label">AI Conversations</div>
