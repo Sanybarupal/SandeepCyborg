@@ -19,7 +19,7 @@ export default function HomePage() {
           <div className="logo-icon">
             <BsCpu />
           </div>
-          <span className="logo-text">Sandeep Clone</span>
+          <span className="logo-text logo">Sandeep Clone</span>
           <span className="badge-aios">AI OS</span>
         </div>
 
@@ -151,7 +151,7 @@ export default function HomePage() {
 
         {/* Hero Text */}
         <div className="hero-content">
-          <h1>
+          <h1 className="heading">
             BUILT ON THE LARGEST<br />
             NETWORK OF <span className="text-gradient">AI INTERFACES</span>
           </h1>
