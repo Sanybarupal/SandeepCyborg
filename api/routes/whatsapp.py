@@ -70,7 +70,8 @@ def process_webhook_background(payload: dict, db: Session):
             client_id=client.id,
             role="user",
             content=user_msg_content,
-            platform=Platform.whatsapp
+            platform=Platform.whatsapp,
+            session_id=f"wa_{clean_phone}"
         )
         db.add(user_conv)
         db.commit()
@@ -129,6 +130,7 @@ def process_webhook_background(payload: dict, db: Session):
                 role="ai",
                 content=reply_msg,
                 platform=Platform.whatsapp,
+                session_id=f"wa_{clean_phone}",
                 is_sent=True
             )
             db.add(ai_conv)
@@ -164,6 +166,7 @@ async def send_manual_message(payload: dict, db: Session = Depends(get_db)):
             role="system",
             content=message,
             platform=Platform.whatsapp,
+            session_id=f"wa_{client.phone}",
             is_sent=True
         )
         db.add(conv)

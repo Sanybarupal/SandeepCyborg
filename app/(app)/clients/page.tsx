@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 const API = ''
 
@@ -31,6 +31,7 @@ function WhatsAppSettingsToggle() {
   const [enabled, setEnabled] = useState(true)
   const [waStatus, setWaStatus] = useState<{ready: boolean, qr: string | null}>({ ready: false, qr: null })
   const [showQrModal, setShowQrModal] = useState(false)
+  const hasSynced = useRef(false)
 
   useEffect(() => {
     // Fetch AI setting
@@ -53,6 +54,13 @@ function WhatsAppSettingsToggle() {
     const interval = setInterval(checkStatus, 3000)
     return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    if (waStatus.ready && !hasSynced.current) {
+      hasSynced.current = true;
+      fetch(`${API}/api/whatsapp/sync-chats`, { method: 'POST' }).catch(() => {});
+    }
+  }, [waStatus.ready])
 
   const toggle = async () => {
     const newVal = !enabled
@@ -252,9 +260,9 @@ export default function ClientsPage() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="pane-layout">
         {/* Left Column: Client List */}
-        <div style={{ width: 320, minWidth: 280, borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', background: 'var(--bg-surface)' }}>
+        <div className="pane-sidebar">
           <div style={{ padding: '16px', borderBottom: '1px solid var(--border)' }}>
             <input
               className="input"
@@ -311,7 +319,7 @@ export default function ClientsPage() {
         </div>
 
         {/* Middle Column: Chat Window */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-base)' }}>
+        <div className="pane-main">
           {selectedClient ? (
             <>
               {/* Chat Header */}
@@ -393,7 +401,7 @@ export default function ClientsPage() {
 
         {/* Right Column: Client Details */}
         {selectedClient && (
-          <div style={{ width: 300, minWidth: 260, borderLeft: '1px solid var(--border)', background: 'var(--bg-surface)', display: 'flex', flexDirection: 'column' }}>
+          <div className="pane-details">
             <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: 16 }}>
               Client Information
             </div>

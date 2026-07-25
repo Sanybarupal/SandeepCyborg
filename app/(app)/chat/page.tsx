@@ -259,9 +259,9 @@ function ChatInner() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="pane-layout">
         {/* Left Column: Recent AI Conversations */}
-        <div style={{ width: 300, borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', background: 'var(--bg-surface)' }}>
+        <div className="pane-sidebar">
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 600 }}>
             Recent Conversations
           </div>
@@ -295,7 +295,7 @@ function ChatInner() {
         </div>
 
         {/* Middle Column: Active Chat Feed */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-base)' }}>
+        <div className="pane-main">
           {/* Chat Header */}
           <div style={{ padding: '12px 20px', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
@@ -378,7 +378,7 @@ function ChatInner() {
 
         {/* Right Column: AI Controls & Client Info */}
         {clientDetails && (
-          <div style={{ width: 300, borderLeft: '1px solid var(--border)', background: 'var(--bg-surface)', display: 'flex', flexDirection: 'column' }}>
+          <div className="pane-details">
             <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: 16 }}>
               AI Controls & Client Info
             </div>

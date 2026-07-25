@@ -3685,5 +3685,80 @@ tbody tr:last-child td {
   .data-card, .feat-card {
     min-width: 100%;
   }
+
+  /* App Layout Adjustments for Mobile */
+  .main-content {
+    margin-left: 0;
+    padding: 16px 12px;
+  }
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .mobile-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+
+  /* Pane Layouts for Mobile */
+  .pane-layout {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+  .pane-sidebar, .pane-main, .pane-details {
+    width: 100% !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 1px solid var(--border);
+    min-height: 400px;
+  }
 }
+
+/* Utilities for Pane Layout (Desktop) */
+.pane-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+.pane-sidebar {
+  width: 320px;
+  min-width: 280px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+}
+.pane-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+}
+.pane-details {
+  width: 300px;
+  min-width: 260px;
+  border-left: 1px solid var(--border);
+  background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+}
+
 
