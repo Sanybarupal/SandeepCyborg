@@ -1,253 +1,97 @@
 'use client'
-
-import { useRef, useState } from 'react'
-
-const API = ''
-
-interface UploadResult {
-  message: string
-  clients_found: number
-  preview: Array<{ name?: string; phone?: string; company?: string; email?: string; requirement?: string }>
-  approval_id: number
-  status: string
-}
+import { useState } from 'react'
+import { Icons } from '@/components/Icons'
 
 export default function UploadPage() {
   const [dragging, setDragging] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [result, setResult] = useState<UploadResult | null>(null)
-  const [error, setError] = useState('')
-  const [approved, setApproved] = useState(false)
-  const [approving, setApproving] = useState(false)
-  const fileRef = useRef<HTMLInputElement>(null)
 
-  const handleFile = async (file: File) => {
-    setError('')
-    setResult(null)
-    setApproved(false)
-    setUploading(true)
-
-    const formData = new FormData()
-    formData.append('file', file)
-
-    try {
-      const res = await fetch(`${API}/api/upload/clients`, {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.detail || 'Upload fail ho gaya')
-      }
-
-      const data: UploadResult = await res.json()
-      setResult(data)
-    } catch (e: any) {
-      setError(e.message || 'Upload mein error aaya')
-    }
-
-    setUploading(false)
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setDragging(false)
-    const file = e.dataTransfer.files[0]
-    if (file) handleFile(file)
-  }
-
-  const handleApprove = async () => {
-    if (!result?.approval_id) return
-    setApproving(true)
-
-    try {
-      // First approve
-      await fetch(`${API}/api/approvals/${result.approval_id}/approve`, { method: 'POST' })
-      // Then execute import
-      const res = await fetch(`${API}/api/upload/execute-import/${result.approval_id}`, { method: 'POST' })
-      const data = await res.json()
-      setApproved(true)
-      setResult(prev => prev ? { ...prev, message: data.message } : prev)
-    } catch {
-      setError('Approval mein error aaya')
-    }
-    setApproving(false)
-  }
+  const files = [
+    { name: 'company-handbook.pdf', size: '2.4 MB', status: 'processed', type: 'PDF', date: 'Jul 25, 2026' },
+    { name: 'pricing-guide-v3.docx', size: '890 KB', status: 'processed', type: 'DOC', date: 'Jul 24, 2026' },
+    { name: 'client-database.csv', size: '5.1 MB', status: 'processing', type: 'CSV', date: 'Jul 26, 2026' },
+    { name: 'product-images.zip', size: '34 MB', status: 'processed', type: 'ZIP', date: 'Jul 22, 2026' },
+    { name: 'api-documentation.md', size: '128 KB', status: 'processed', type: 'MD', date: 'Jul 21, 2026' },
+  ]
 
   return (
-    <div className="animate-in">
+    <div className="page-container">
       <div className="page-header">
-        <div>
-          <h1 className="page-title">📂 Client Upload</h1>
-          <div className="page-subtitle">CSV, Excel ya PDF se clients bulk import karein</div>
+        <div className="page-header-left">
+          <h1 className="page-title">Upload Center</h1>
+          <p className="page-subtitle">Upload files to train your AI knowledge base</p>
         </div>
       </div>
 
-      {/* Instructions */}
-      <div className="card" style={{ marginBottom: 20, borderColor: 'rgba(34,211,238,0.15)' }}>
-        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: 'var(--cyan)' }}>📋 File Format Guide</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>CSV / Excel Columns:</div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.8 }}>
-              • <code style={{ background:'var(--bg-elevated)', padding:'1px 5px', borderRadius:3 }}>Name</code> (zaroori)<br/>
-              • <code style={{ background:'var(--bg-elevated)', padding:'1px 5px', borderRadius:3 }}>Phone</code><br/>
-              • <code style={{ background:'var(--bg-elevated)', padding:'1px 5px', borderRadius:3 }}>Company</code><br/>
-              • <code style={{ background:'var(--bg-elevated)', padding:'1px 5px', borderRadius:3 }}>Email</code><br/>
-              • <code style={{ background:'var(--bg-elevated)', padding:'1px 5px', borderRadius:3 }}>Requirement</code>
-            </div>
+      {/* Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}>
+        {[
+          { label: 'Total Files', value: '248', color: 'blue' },
+          { label: 'Knowledge Base', value: '1.2 GB', color: 'green' },
+          { label: 'Processing', value: '3', color: 'orange' },
+          { label: 'AI Trained', value: '99.2%', color: 'purple' },
+        ].map((s, i) => (
+          <div key={i} className="glass-card-static" style={{ padding: 20 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>{s.label}</div>
+            <div style={{ fontFamily: 'var(--font-head)', fontSize: 24, fontWeight: 700 }}>{s.value}</div>
           </div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>Supported Formats:</div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 2 }}>
-              • .csv (Excel se export kiya)<br/>
-              • .xlsx (Excel 2007+)<br/>
-              • .xls (Excel old format)<br/>
-              • .pdf (text extract hoga)
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Upload Zone */}
       <div
-        className={`upload-zone ${dragging ? 'dragover' : ''}`}
+        className="glass-card-static"
         onDragOver={e => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
-        onDrop={handleDrop}
-        onClick={() => fileRef.current?.click()}
+        onDrop={() => setDragging(false)}
+        style={{
+          padding: 48, textAlign: 'center', marginBottom: 28, cursor: 'pointer',
+          border: `2px dashed ${dragging ? 'var(--primary)' : 'var(--border-light)'}`,
+          background: dragging ? 'rgba(79,140,255,0.05)' : 'var(--panel)',
+          transition: 'all 0.3s',
+        }}
       >
-        <input
-          ref={fileRef}
-          type="file"
-          accept=".csv,.xlsx,.xls,.pdf"
-          style={{ display: 'none' }}
-          onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])}
-        />
-
-        {uploading ? (
-          <>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>⏳</div>
-            <div className="upload-title">File upload ho rahi hai...</div>
-            <div className="upload-sub">Clients extract ho rahe hain</div>
-          </>
-        ) : (
-          <>
-            <div className="upload-icon">📂</div>
-            <div className="upload-title">File yahan drop karein</div>
-            <div className="upload-sub">
-              ya click karein select karne ke liye<br/>
-              <span style={{ color: 'var(--purple-light)', marginTop: 8, display: 'block' }}>CSV • Excel • PDF</span>
-            </div>
-          </>
-        )}
+        <div style={{ width: 64, height: 64, margin: '0 auto 16px', borderRadius: 16, background: 'rgba(79,140,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+          {Icons.upload}
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Drop files here or click to upload</div>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Supports PDF, DOCX, CSV, TXT, MD, JSON up to 50MB</div>
       </div>
 
-      {/* Error */}
-      {error && (
-        <div style={{
-          marginTop: 16, padding: '12px 16px',
-          background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-          borderRadius: 8, color: 'var(--red)', fontSize: 14
-        }}>
-          ❌ {error}
+      {/* File List */}
+      <div className="glass-card-static" style={{ padding: 0 }}>
+        <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span className="section-title" style={{ margin: 0 }}>UPLOADED FILES</span>
+          <button className="btn-outline" style={{ padding: '6px 14px', fontSize: 12 }}>{Icons.filter} Filter</button>
         </div>
-      )}
-
-      {/* Result */}
-      {result && !approved && (
-        <div className="card" style={{ marginTop: 20, borderColor: 'rgba(245,158,11,0.2)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-            <div style={{ fontSize: 32 }}>👥</div>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
-                {result.clients_found} Clients Mile!
-              </div>
-              <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                {result.message}
-              </div>
+        {files.map((file, i) => (
+          <div key={i} style={{
+            padding: '14px 24px', display: 'flex', alignItems: 'center', gap: 16,
+            borderBottom: i < files.length - 1 ? '1px solid var(--border)' : 'none',
+            transition: 'background 0.15s', cursor: 'pointer',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          >
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(79,140,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontSize: 11, fontWeight: 700 }}>
+              {file.type}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 500 }}>{file.name}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{file.size} · {file.date}</div>
+            </div>
+            <span style={{
+              fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '0.5px',
+              background: file.status === 'processed' ? 'rgba(34,197,94,0.1)' : 'rgba(245,158,11,0.1)',
+              color: file.status === 'processed' ? 'var(--green)' : 'var(--orange)',
+              border: `1px solid ${file.status === 'processed' ? 'rgba(34,197,94,0.2)' : 'rgba(245,158,11,0.2)'}`,
+            }}>{file.status}</span>
+            <div style={{ display: 'flex', gap: 4 }}>
+              <button className="ds-nav-btn" style={{ width: 32, height: 32 }}>{Icons.eye}</button>
+              <button className="ds-nav-btn" style={{ width: 32, height: 32 }}>{Icons.trash}</button>
             </div>
           </div>
-
-          {/* Preview Table */}
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Preview (Pehle 5 clients):
-            </div>
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Naam</th>
-                    <th>Phone</th>
-                    <th>Company</th>
-                    <th>Email</th>
-                    <th>Requirement</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.preview.map((c, i) => (
-                    <tr key={i}>
-                      <td>{c.name || '—'}</td>
-                      <td style={{ fontSize: 12 }}>{c.phone || '—'}</td>
-                      <td>{c.company || '—'}</td>
-                      <td style={{ fontSize: 12 }}>{c.email || '—'}</td>
-                      <td style={{ fontSize: 12, color: 'var(--text-secondary)', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.requirement || '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Approval Required */}
-          <div style={{
-            background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)',
-            borderRadius: 10, padding: '16px 20px', marginBottom: 20,
-          }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--orange)', marginBottom: 6 }}>
-              ⚠️ Aapki Permission Chahiye
-            </div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-              {result.clients_found} clients import hone waale hain. Kya aap approve karte hain?
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button
-              className="btn btn-success"
-              onClick={handleApprove}
-              disabled={approving}
-              style={{ fontSize: 15, padding: '12px 24px' }}
-            >
-              {approving ? '⏳ Import ho raha...' : `✅ Haan! ${result.clients_found} Clients Import Karein`}
-            </button>
-            <button
-              className="btn btn-danger"
-              onClick={() => setResult(null)}
-              disabled={approving}
-            >
-              ❌ Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Success */}
-      {approved && result && (
-        <div className="card" style={{ marginTop: 20, borderColor: 'rgba(16,185,129,0.2)', textAlign: 'center', padding: 40 }}>
-          <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--green)', marginBottom: 8 }}>Import Successful!</div>
-          <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 24 }}>{result.message}</div>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-            <a href="/clients" className="btn btn-primary">👥 Clients Dekhein</a>
-            <button className="btn btn-ghost" onClick={() => { setResult(null); setApproved(false) }}>
-              📂 Aur Upload Karein
-            </button>
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   )
 }

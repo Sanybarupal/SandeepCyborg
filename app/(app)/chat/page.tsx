@@ -1,449 +1,103 @@
 'use client'
+import { useState } from 'react'
+import { Icons } from '@/components/Icons'
 
-import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+const conversations = [
+  { name: 'System Assistant', preview: 'I\'ve processed 128 new documents for your knowledge base.', time: '2m', unread: 3, model: 'GPT-4' },
+  { name: 'Client Support Bot', preview: 'Rahul Sharma asked about pricing for enterprise plan.', time: '15m', unread: 1, model: 'Claude' },
+  { name: 'Content Writer', preview: 'Draft for the landing page copy is ready for review.', time: '1h', unread: 0, model: 'GPT-4' },
+  { name: 'Code Assistant', preview: 'Fixed the API endpoint issue. PR ready for review.', time: '3h', unread: 0, model: 'GPT-4' },
+]
 
-const API = ''
-
-interface Message {
-  id?: number
-  role: 'user' | 'ai' | 'system'
-  content: string
-  created_at?: string
-}
-
-interface Session {
-  session_id: string
-  client_id: number | null
-  client_name: string | null
-  platform: string
-  last_message: string
-  last_active: string
-}
-
-interface ClientDetails {
-  id: number
-  name: string
-  phone: string
-  company: string
-  email: string
-  requirement: string
-  budget: string
-  timeline: string
-  platform: string
-  status: string
-  ai_paused: boolean
-}
-
-function ChatInner() {
-  const searchParams = useSearchParams()
-  const urlClientId = searchParams.get('client')
-
-  const [messages, setMessages] = useState<Message[]>([])
-  const [sessions, setSessions] = useState<Session[]>([])
-  const [sessionId, setSessionId] = useState<string | null>(null)
-  const [selectedClientId, setSelectedClientId] = useState<number | null>(null)
-  const [clientDetails, setClientDetails] = useState<ClientDetails | null>(null)
-  const [input, setInput] = useState('')
-  const [sending, setSending] = useState(false)
-  const [aiMode, setAiMode] = useState('mock')
-  const [aiStatus, setAiStatus] = useState<'idle' | 'processing'>('idle')
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    fetchSessions()
-    fetchAiMode()
-  }, [])
-
-  useEffect(() => {
-    if (urlClientId) {
-      const cid = parseInt(urlClientId)
-      setSelectedClientId(cid)
-      fetchClientDetails(cid)
-      // Attempt to find a session for this client
-      const foundSession = sessions.find(s => s.client_id === cid)
-      if (foundSession) {
-        loadSession(foundSession.session_id, cid)
-      } else {
-        setSessionId(null)
-        setMessages([{
-          role: 'ai',
-          content: 'Sandeep AI is ready. Start typing to initiate conversation with this client.'
-        }])
-      }
-    }
-  }, [urlClientId, sessions])
-
-  const fetchAiMode = async () => {
-    try {
-      const res = await fetch(`${API}/`)
-      const data = await res.json()
-      setAiMode(data.ai_mode || 'mock')
-    } catch {}
-  }
-
-  const fetchSessions = async () => {
-    try {
-      const res = await fetch(`${API}/api/chat/sessions`)
-      const data = await res.json()
-      setSessions(data || [])
-    } catch {}
-  }
-
-  const fetchClientDetails = async (cid: number) => {
-    try {
-      const res = await fetch(`${API}/api/clients/${cid}`)
-      if (res.ok) {
-        const data = await res.json()
-        setClientDetails(data)
-      }
-    } catch {}
-  }
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  useEffect(scrollToBottom, [messages])
-
-  const sendMessage = async () => {
-    const text = input.trim()
-    if (!text || sending) return
-
-    setInput('')
-    setSending(true)
-    setAiStatus('processing')
-
-    // Add user message instantly
-    setMessages(prev => [...prev, { role: 'user', content: text }])
-    setMessages(prev => [...prev, { role: 'ai', content: '__typing__' }])
-
-    try {
-      const res = await fetch(`${API}/api/chat/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: text,
-          client_id: selectedClientId,
-          session_id: sessionId,
-          platform: 'direct',
-        }),
-      })
-      const data = await res.json()
-
-      // Remove typing indicator and add real response
-      setMessages(prev => [
-        ...prev.filter(m => m.content !== '__typing__'),
-        { role: 'ai', content: data.response }
-      ])
-
-      if (data.session_id && !sessionId) {
-        setSessionId(data.session_id)
-      }
-      setAiMode(data.mode || 'mock')
-      fetchSessions()
-    } catch {
-      setMessages(prev => [
-        ...prev.filter(m => m.content !== '__typing__'),
-        { role: 'ai', content: 'Sorry, backend connection failed. Ensure FastAPI is running.' }
-      ])
-    }
-
-    setSending(false)
-    setAiStatus('idle')
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      sendMessage()
-    }
-  }
-
-  const loadSession = async (sid: string, cid: number | null) => {
-    setSessionId(sid)
-    setSelectedClientId(cid)
-    if (cid) {
-      fetchClientDetails(cid)
-    } else {
-      setClientDetails(null)
-    }
-
-    try {
-      const res = await fetch(`${API}/api/chat/history/${sid}`)
-      const data = await res.json()
-      const msgs = data.map((m: any) => ({
-        id: m.id,
-        role: m.role as 'user' | 'ai' | 'system',
-        content: m.content,
-        created_at: m.created_at,
-      }))
-      setMessages(msgs)
-    } catch {}
-  }
-
-  const toggleAiPause = async (pause: boolean) => {
-    if (!selectedClientId || !clientDetails) return
-    try {
-      const res = await fetch(`${API}/api/clients/${selectedClientId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ai_paused: pause })
-      })
-      if (res.ok) {
-        setClientDetails({ ...clientDetails, ai_paused: pause })
-        setMessages(prev => [...prev, {
-          role: 'system',
-          content: `AI Auto-reply has been ${pause ? 'PAUSED' : 'RESUMED'} for this client.`
-        }])
-      }
-    } catch {}
-  }
-
-  const handleRequestApproval = async () => {
-    if (!selectedClientId) return
-    try {
-      const res = await fetch(`${API}/api/clients/${selectedClientId}/message`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: "Requesting approval for budget & timeline proposed by AI." })
-      })
-      if (res.ok) {
-        alert("Approval request sent successfully!")
-      }
-    } catch {}
-  }
-
-  return (
-    <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 48px)', overflow: 'hidden' }}>
-      <div className="page-header" style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)', background: 'var(--bg-surface)', flexShrink: 0 }}>
-        <div>
-          <h1 className="page-title">💬 AI Chat</h1>
-          <div className="page-subtitle">
-            Monitor and manage AI interactions with clients
-            <span className={`ai-mode-badge ${aiMode === 'gpt4' ? 'ai-mode-gpt4' : 'ai-mode-mock'}`} style={{ marginLeft: 10 }}>
-              {aiMode === 'gpt4' ? '🟢 GPT-4' : '🟡 Mock Mode'}
-            </span>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={async () => {
-              try {
-                const res = await fetch(`${API}/api/whatsapp/sync-chats`, { method: 'POST' })
-                if (res.ok) {
-                  const data = await res.json()
-                  alert(`Synced ${data.synced_count} WhatsApp mock chats!`)
-                  fetchSessions() // Refresh chats
-                }
-              } catch {
-                alert('Failed to sync WhatsApp chats.')
-              }
-            }}
-          >
-            🔄 Sync WhatsApp
-          </button>
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={() => { 
-              setMessages([{ role: 'ai', content: 'Namaste! Nayi chat shuru karein.' }]); 
-              setSessionId(null);
-              setSelectedClientId(null);
-              setClientDetails(null);
-            }}
-          >
-            + Nayi Chat
-          </button>
-        </div>
-      </div>
-
-      <div className="pane-layout">
-        {/* Left Column: Recent AI Conversations */}
-        <div className="pane-sidebar">
-          <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 600 }}>
-            Recent Conversations
-          </div>
-          <div style={{ flex: 1, overflowY: 'auto' }}>
-            {sessions.length === 0 ? (
-              <div style={{ padding: 20, fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }}>
-                Abhi koi active chat nahi hai.
-              </div>
-            ) : (
-              sessions.map(s => (
-                <div
-                  key={s.session_id}
-                  className={`chat-session-item ${sessionId === s.session_id ? 'active' : ''}`}
-                  onClick={() => loadSession(s.session_id, s.client_id)}
-                  style={{
-                    padding: '16px',
-                    borderBottom: '1px solid var(--border)',
-                    cursor: 'pointer',
-                    background: sessionId === s.session_id ? 'var(--bg-elevated)' : 'transparent',
-                    transition: 'background 0.2s'
-                  }}
-                >
-                  <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{s.client_name || 'AI Sandbox'}</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {s.last_message || 'No messages yet'}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Middle Column: Active Chat Feed */}
-        <div className="pane-main">
-          {/* Chat Header */}
-          <div style={{ padding: '12px 20px', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-              <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'var(--grad-brand)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 'bold', flexShrink: 0 }}>
-                {clientDetails ? clientDetails.name.charAt(0).toUpperCase() : '🤖'}
-              </div>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 15 }}>{clientDetails ? clientDetails.name : 'AI operating System Sandbox'}</div>
-                <div style={{ fontSize: 12, color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', display: 'inline-block' }}/>
-                  {aiStatus === 'processing' ? 'AI is replying...' : 'AI Active (Online)'}
-                </div>
-              </div>
-            </div>
-            {clientDetails && (
-              <span className={`badge ${clientDetails.ai_paused ? 'badge-completed' : 'badge-interested'}`}>
-                {clientDetails.ai_paused ? '⏸️ AI Paused' : '🤖 AI Autopilot'}
-              </span>
-            )}
-          </div>
-
-          {/* Messages Feed */}
-          <div style={{ flex: 1, padding: 24, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {messages.map((msg, i) => {
-              if (msg.role === 'system') {
-                return (
-                  <div key={i} style={{ alignSelf: 'center', background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', padding: '6px 16px', borderRadius: 20, fontSize: 12, fontWeight: 500 }}>
-                    {msg.content}
-                  </div>
-                )
-              }
-              return (
-                <div key={i} style={{ 
-                  alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                  background: msg.role === 'user' ? 'var(--purple)' : 'var(--bg-elevated)',
-                  color: msg.role === 'user' ? '#fff' : 'inherit',
-                  padding: '10px 16px',
-                  borderRadius: '16px',
-                  borderBottomRightRadius: msg.role === 'user' ? 4 : 16,
-                  borderBottomLeftRadius: msg.role === 'ai' ? 4 : 16,
-                  maxWidth: '75%',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-                  border: msg.role !== 'user' ? '1px solid var(--border)' : 'none'
-                }}>
-                  {msg.content === '__typing__' ? (
-                    <div className="typing-dots">
-                      <span/><span/><span/>
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: 14 }}>{msg.content}</div>
-                  )}
-                </div>
-              )
-            })}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Message Input */}
-          <div style={{ padding: 16, background: 'var(--bg-surface)', borderTop: '1px solid var(--border)' }}>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <input 
-                className="input" 
-                placeholder={clientDetails?.ai_paused ? "AI is paused. Send manual message..." : "Type here to chat with the AI Sandbox..."}
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                style={{ flex: 1, borderRadius: 20 }}
-              />
-              <button 
-                className="btn btn-primary" 
-                onClick={sendMessage}
-                style={{ borderRadius: 20, padding: '0 20px' }}
-                disabled={!input.trim() || sending}
-              >
-                Send
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: AI Controls & Client Info */}
-        {clientDetails && (
-          <div className="pane-details">
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: 16 }}>
-              AI Controls & Client Info
-            </div>
-            <div style={{ padding: 24, flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
-              
-              <div>
-                <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>AI Actions</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {clientDetails.ai_paused ? (
-                    <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => toggleAiPause(false)}>
-                      ▶️ Resume AI Agent
-                    </button>
-                  ) : (
-                    <button className="btn btn-ghost" style={{ width: '100%', borderColor: 'var(--red)', color: 'var(--red)' }} onClick={() => toggleAiPause(true)}>
-                      ⏸️ Pause AI / Takeover
-                    </button>
-                  )}
-                  
-                  <button className="btn btn-ghost" style={{ width: '100%' }} onClick={handleRequestApproval}>
-                    📝 Request Approval
-                  </button>
-                  <button className="btn btn-ghost" style={{ width: '100%' }} onClick={() => alert("Proposal generated successfully!")}>
-                    💼 Generate Proposal
-                  </button>
-                </div>
-              </div>
-
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20 }}>
-                <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>Client Context</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
-                  <div>
-                    <span style={{ color: 'var(--text-secondary)', display: 'block', fontSize: 12 }}>Requirement</span>
-                    <strong style={{ fontWeight: 500 }}>{clientDetails.requirement || 'Not specified'}</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: 'var(--text-secondary)', display: 'block', fontSize: 12 }}>Budget</span>
-                    <strong style={{ fontWeight: 500 }}>{clientDetails.budget ? `₹${clientDetails.budget}` : 'Not specified'}</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: 'var(--text-secondary)', display: 'block', fontSize: 12 }}>Timeline</span>
-                    <strong style={{ fontWeight: 500 }}>{clientDetails.timeline || 'Not specified'}</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: 'var(--text-secondary)', display: 'block', fontSize: 12 }}>Phone</span>
-                    <strong>{clientDetails.phone || 'No phone'}</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: 'var(--text-secondary)', display: 'block', fontSize: 12 }}>Email</span>
-                    <strong>{clientDetails.email || 'No email'}</strong>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
+const messages = [
+  { role: 'user', text: 'Summarize all client conversations from today and highlight any urgent issues.' },
+  { role: 'ai', text: 'Here\'s your daily summary:\n\n• **42 new conversations** across all channels\n• **3 urgent issues** flagged for attention:\n  1. Rahul Sharma — billing dispute (Enterprise)\n  2. Sarah Johnson — integration failing (API key expired)\n  3. Mike Chen — requesting custom AI model\n\n• **128 documents** processed into knowledge base\n• **Average response time**: 1.2 seconds\n\nWould you like me to draft responses for the urgent issues?' },
+  { role: 'user', text: 'Yes, draft a response for Sarah Johnson\'s issue.' },
+  { role: 'ai', text: 'Draft response for Sarah Johnson:\n\n---\n\nHi Sarah,\n\nThank you for reaching out about the integration issue. I\'ve identified that your API key expired on July 24th.\n\nI\'ve generated a new key and sent it to your registered email. The integration should resume working within 5 minutes of updating the key.\n\nPlease let me know if you need any further assistance!\n\nBest regards,\nSandeep\'s AI Assistant\n\n---\n\nShall I send this directly via WhatsApp?' },
+]
 
 export default function ChatPage() {
+  const [input, setInput] = useState('')
+  const [activeChat, setActiveChat] = useState(0)
+
   return (
-    <Suspense fallback={<div style={{ color: 'var(--text-muted)', padding: 40 }}>Loading...</div>}>
-      <ChatInner />
-    </Suspense>
+    <div style={{ display: 'flex', height: 'calc(100vh - var(--navbar-h))', overflow: 'hidden' }}>
+      {/* Conversation List */}
+      <div style={{ width: 320, borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', background: 'rgba(8,12,28,0.5)' }}>
+        <div style={{ padding: '20px 16px', borderBottom: '1px solid var(--border)' }}>
+          <h2 style={{ fontFamily: 'var(--font-head)', fontSize: 18, fontWeight: 700, marginBottom: 12 }}>AI Chat</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px' }}>
+            <div style={{ color: 'var(--text-muted)' }}>{Icons.search}</div>
+            <input placeholder="Search conversations..." style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontSize: 13 }} />
+          </div>
+        </div>
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          {conversations.map((c, i) => (
+            <div key={i} onClick={() => setActiveChat(i)} style={{
+              padding: '14px 16px', cursor: 'pointer', borderBottom: '1px solid var(--border)',
+              background: activeChat === i ? 'rgba(79,140,255,0.06)' : 'transparent',
+              borderLeft: activeChat === i ? '2px solid var(--primary)' : '2px solid transparent',
+              transition: 'all 0.15s',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <span style={{ fontWeight: 600, fontSize: 14 }}>{c.name}</span>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{c.time}</span>
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.preview}</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+                <span style={{ fontSize: 10, color: 'var(--purple-light)', background: 'rgba(139,92,246,0.1)', padding: '2px 8px', borderRadius: 4 }}>{c.model}</span>
+                {c.unread > 0 && <span style={{ fontSize: 10, fontWeight: 700, background: 'var(--primary)', color: 'white', width: 18, height: 18, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{c.unread}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Chat Window */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* Chat Header */}
+        <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 16 }}>{conversations[activeChat].name}</div>
+            <div style={{ fontSize: 12, color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <div style={{ width: 6, height: 6, background: 'var(--green)', borderRadius: '50%' }} /> Online · {conversations[activeChat].model}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn-outline" style={{ padding: '8px 14px', fontSize: 12 }}>{Icons.download} Export</button>
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div style={{ flex: 1, overflow: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {messages.map((msg, i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%', alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+              <div style={{
+                background: msg.role === 'user' ? 'linear-gradient(135deg, rgba(79,140,255,0.2), rgba(139,92,246,0.2))' : 'var(--panel)',
+                border: `1px solid ${msg.role === 'user' ? 'rgba(79,140,255,0.2)' : 'var(--border)'}`,
+                borderRadius: 16, padding: '14px 18px', fontSize: 14, lineHeight: 1.6, whiteSpace: 'pre-wrap',
+              }}>
+                {msg.text}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Input */}
+        <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 14, padding: '12px 16px' }}>
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              placeholder="Ask your AI assistant..."
+              style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontSize: 14 }}
+            />
+            <button style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, var(--primary), var(--purple))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+              {Icons.send}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { DesktopShell } from '../components/DesktopShell'
 
 export const metadata: Metadata = {
   title: 'Sandeep Clone — AI Operating System',
@@ -9,15 +10,8 @@ export const metadata: Metadata = {
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
-    viewportFit: 'cover',
   },
   themeColor: '#050816',
-  manifest: '/manifest.json',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'Sandeep AI OS',
-  },
 }
 
 export default function RootLayout({
@@ -28,12 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="theme-color" content="#050816" />
       </head>
       <body>
-        {children}
+        <DesktopShell>
+          {children}
+        </DesktopShell>
       </body>
     </html>
   )
