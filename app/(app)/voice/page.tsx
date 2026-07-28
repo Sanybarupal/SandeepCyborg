@@ -69,8 +69,12 @@ export default function VoicePage() {
               <div key={i} style={{
                 width: 3, borderRadius: 3,
                 background: `linear-gradient(to top, ${listening ? 'var(--cyan)' : 'var(--primary)'}, ${listening ? 'var(--primary)' : 'var(--purple)'})`,
-                animation: listening ? `waveAnim 0.8s ease-in-out infinite` : 'none',
-                animationDelay: `${i * 0.04}s`, height: listening ? undefined : 4,
+                animationName: listening ? 'waveAnim' : 'none',
+                animationDuration: '0.8s',
+                animationTimingFunction: 'ease-in-out',
+                animationIterationCount: 'infinite',
+                animationDelay: `${i * 0.04}s`, 
+                height: listening ? undefined : 4,
                 opacity: listening ? 1 : 0.3,
               }} />
             ))}

@@ -19,6 +19,7 @@ from routes.approvals import router as approvals_router
 from routes.uploads import router as uploads_router
 from routes.notifications import router as notifications_router
 from routes.whatsapp import router as whatsapp_router
+from routes.voice_agent import router as voice_router
 
 # ─── App Init ──────────────────────────────────────
 app = FastAPI(
@@ -44,6 +45,7 @@ app.include_router(approvals_router, prefix="/api")
 app.include_router(uploads_router,   prefix="/api")
 app.include_router(notifications_router, prefix="/api")
 app.include_router(whatsapp_router,    prefix="/api")
+app.include_router(voice_router,       prefix="/api")
 
 
 # ─── Startup ───────────────────────────────────────
