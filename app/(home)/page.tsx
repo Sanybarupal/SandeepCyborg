@@ -124,8 +124,8 @@ export default function DashboardPage() {
       {/* Main Grid */}
       <div className="dash-grid">
         <div className="dash-grid-left">
-          {/* Globe Section */}
-          <div className="dash-globe-section">
+          {/* AI Core Section (Globe) */}
+          <div className="dash-globe-section glass-panel ds-mobile-ai-core">
             <div className="dash-globe-kicker">AI POWERED · AUTOMATION DRIVEN</div>
             <h2 className="dash-globe-title">
               YOUR PERSONAL <span className="gradient-text">AI OPERATING SYSTEM</span>
@@ -163,11 +163,11 @@ export default function DashboardPage() {
           </div>
 
           {/* Quick Actions */}
-          <div>
+          <div className="ds-mobile-section">
             <div className="section-title">QUICK ACTIONS</div>
-            <div className="dash-actions">
+            <div className="dash-actions dash-mobile-scroll">
               {quickActions.map((a, i) => (
-                <div key={i} className="dash-action">
+                <div key={i} className="dash-action glass-card ds-mobile-quick-card">
                   <div className={`dash-action-icon dai--${a.color}`}>{a.icon}</div>
                   <div className="dash-action-lbl">{a.label}</div>
                 </div>
@@ -178,8 +178,23 @@ export default function DashboardPage() {
 
         {/* Right Column */}
         <div className="dash-grid-right">
+          {/* AI Assistant */}
+          <div className="dash-ai-panel glass-panel ds-mobile-ai-panel">
+            <div className="dash-sys-title">{Icons.bolt} AI ASSISTANT</div>
+            <div className="dash-ai-wave">
+              {Array.from({ length: 24 }).map((_, i) => (
+                <div key={i} className="dash-ai-wave-bar" style={{ animationDelay: `${i * 0.05}s` }} />
+              ))}
+            </div>
+            <div className="dash-ai-listen">Listening...</div>
+            <div className="dash-ai-prompt">How can I assist you today?</div>
+            <button className="dash-ai-speak-btn ds-mobile-speak-btn">
+              {Icons.mic} Speak Now
+            </button>
+          </div>
+
           {/* System Status */}
-          <div className="dash-sys-panel">
+          <div className="dash-sys-panel glass-panel ds-mobile-sys-panel">
             <div className="dash-sys-title">{Icons.bolt} SYSTEM STATUS</div>
             <div className="dash-sys-overall">
               <div className="dash-sys-dot" />
@@ -193,38 +208,25 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* AI Assistant */}
-          <div className="dash-ai-panel">
-            <div className="dash-sys-title">{Icons.bolt} AI ASSISTANT</div>
-            <div className="dash-ai-wave">
-              {Array.from({ length: 24 }).map((_, i) => (
-                <div key={i} className="dash-ai-wave-bar" style={{ animationDelay: `${i * 0.05}s` }} />
+          {/* Recent Activity */}
+          <div className="dash-sys-panel glass-panel ds-mobile-activity">
+            <div className="dash-sys-title">{Icons.activity} RECENT ACTIVITY</div>
+            <div className="ds-mobile-timeline">
+              {[
+                { icon: Icons.whatsapp, text: '320 new WhatsApp messages', time: '2m ago', color: 'green' },
+                { icon: Icons.chat, text: 'AI processed 842 conversations', time: '15m ago', color: 'purple' },
+                { icon: Icons.upload, text: '12 files uploaded to knowledge', time: '1h ago', color: 'blue' },
+                { icon: Icons.shield, text: '3 approvals pending review', time: '2h ago', color: 'orange' },
+              ].map((item, i) => (
+                <div key={i} className="ds-mobile-timeline-item">
+                  <div className={`dash-action-icon dai--${item.color} ds-timeline-icon`}>{item.icon}</div>
+                  <div className="ds-timeline-content">
+                    <div className="ds-timeline-text">{item.text}</div>
+                    <div className="ds-timeline-time">{item.time}</div>
+                  </div>
+                </div>
               ))}
             </div>
-            <div className="dash-ai-listen">Listening...</div>
-            <div className="dash-ai-prompt">How can I assist you today?</div>
-            <button className="dash-ai-speak-btn">
-              {Icons.mic} Speak Now
-            </button>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="dash-sys-panel">
-            <div className="dash-sys-title">{Icons.activity} RECENT ACTIVITY</div>
-            {[
-              { icon: Icons.whatsapp, text: '320 new WhatsApp messages', time: '2m ago', color: 'green' },
-              { icon: Icons.chat, text: 'AI processed 842 conversations', time: '15m ago', color: 'purple' },
-              { icon: Icons.upload, text: '12 files uploaded to knowledge', time: '1h ago', color: 'blue' },
-              { icon: Icons.shield, text: '3 approvals pending review', time: '2h ago', color: 'orange' },
-            ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: i < 3 ? '1px solid var(--border)' : 'none' }}>
-                <div className={`dash-action-icon dai--${item.color}`} style={{ width: 32, height: 32, borderRadius: 8, minWidth: 32 }}>{item.icon}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 500 }}>{item.text}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.time}</div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </div>

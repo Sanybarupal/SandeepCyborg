@@ -14,7 +14,7 @@ export default function VoicePage() {
   const [listening, setListening] = useState(false)
 
   return (
-    <div className="page-container">
+    <div className="page-container ds-mobile-page">
       <div className="page-header">
         <div className="page-header-left">
           <h1 className="page-title">Voice AI</h1>
@@ -22,22 +22,16 @@ export default function VoicePage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 24 }}>
+      <div className="ds-voice-grid">
         {/* Main Voice Area */}
-        <div className="glass-card-static" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 500, position: 'relative', overflow: 'hidden' }}>
+        <div className="glass-card ds-voice-main">
           {/* Background glow */}
-          <div style={{ position: 'absolute', width: 400, height: 400, background: `radial-gradient(circle, ${listening ? 'rgba(0,229,255,0.15)' : 'rgba(79,140,255,0.08)'} 0%, transparent 70%)`, borderRadius: '50%', transition: 'all 0.5s' }} />
+          <div className="ds-voice-glow" style={{ background: `radial-gradient(circle, ${listening ? 'rgba(0,229,255,0.15)' : 'rgba(79,140,255,0.08)'} 0%, transparent 70%)` }} />
 
           {/* Mic button */}
           <button
             onClick={() => setListening(!listening)}
-            style={{
-              position: 'relative', zIndex: 2, width: 120, height: 120, borderRadius: '50%',
-              background: listening ? 'linear-gradient(135deg, var(--cyan), var(--primary))' : 'linear-gradient(135deg, var(--primary), var(--purple))',
-              border: 'none', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: listening ? '0 0 40px var(--cyan-glow), 0 0 80px rgba(0,229,255,0.15)' : '0 0 30px var(--primary-glow)',
-              transition: 'all 0.4s', cursor: 'pointer', transform: listening ? 'scale(1.05)' : 'scale(1)',
-            }}
+            className={`ds-voice-mic-btn ${listening ? 'ds-listening' : ''}`}
           >
             <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
               <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
@@ -48,31 +42,27 @@ export default function VoicePage() {
           {/* Pulse rings */}
           {listening && (
             <>
-              <div style={{ position: 'absolute', width: 160, height: 160, borderRadius: '50%', border: '2px solid rgba(0,229,255,0.2)', animation: 'pulse 2s infinite', zIndex: 1 }} />
-              <div style={{ position: 'absolute', width: 200, height: 200, borderRadius: '50%', border: '1px solid rgba(0,229,255,0.1)', animation: 'pulse 2s infinite 0.5s', zIndex: 1 }} />
-              <div style={{ position: 'absolute', width: 250, height: 250, borderRadius: '50%', border: '1px solid rgba(0,229,255,0.05)', animation: 'pulse 2s infinite 1s', zIndex: 1 }} />
+              <div className="ds-pulse-ring ring-1" />
+              <div className="ds-pulse-ring ring-2" />
+              <div className="ds-pulse-ring ring-3" />
             </>
           )}
 
-          <div style={{ marginTop: 32, textAlign: 'center', position: 'relative', zIndex: 2 }}>
-            <div style={{ fontSize: 18, fontWeight: 600, color: listening ? 'var(--cyan)' : 'var(--text)' }}>
+          <div className="ds-voice-text-area">
+            <div className="ds-voice-status" style={{ color: listening ? 'var(--cyan)' : 'var(--text)' }}>
               {listening ? 'Listening...' : 'Tap to Speak'}
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
+            <div className="ds-voice-sub">
               {listening ? 'Say your command clearly' : 'Hold or tap the microphone to start'}
             </div>
           </div>
 
           {/* Waveform */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 2, height: 50, marginTop: 32, position: 'relative', zIndex: 2 }}>
+          <div className="ds-voice-waveform">
             {Array.from({ length: 40 }).map((_, i) => (
-              <div key={i} style={{
-                width: 3, borderRadius: 3,
+              <div key={i} className="ds-wave-bar" style={{
                 background: `linear-gradient(to top, ${listening ? 'var(--cyan)' : 'var(--primary)'}, ${listening ? 'var(--primary)' : 'var(--purple)'})`,
                 animationName: listening ? 'waveAnim' : 'none',
-                animationDuration: '0.8s',
-                animationTimingFunction: 'ease-in-out',
-                animationIterationCount: 'infinite',
                 animationDelay: `${i * 0.04}s`, 
                 height: listening ? undefined : 4,
                 opacity: listening ? 1 : 0.3,
@@ -82,22 +72,15 @@ export default function VoicePage() {
         </div>
 
         {/* Command History */}
-        <div className="glass-card-static" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div className="section-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>{Icons.clock} COMMAND HISTORY</div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div className="glass-card ds-voice-history">
+          <div className="section-title ds-history-title">{Icons.clock} COMMAND HISTORY</div>
+          <div className="ds-history-list">
             {commandHistory.map((cmd, i) => (
-              <div key={i} style={{ padding: '14px 0', borderBottom: i < commandHistory.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 13, fontWeight: 500 }}>{cmd.command}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{
-                    fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-                    background: cmd.status === 'completed' ? 'rgba(34,197,94,0.1)' : 'rgba(245,158,11,0.1)',
-                    color: cmd.status === 'completed' ? 'var(--green)' : 'var(--orange)',
-                    textTransform: 'uppercase',
-                  }}>{cmd.status}</span>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{cmd.time}</span>
+              <div key={i} className="ds-history-item" style={{ borderBottom: i < commandHistory.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                <div className="ds-history-cmd">{cmd.command}</div>
+                <div className="ds-history-meta">
+                  <span className={`ds-history-badge ds-badge-${cmd.status}`}>{cmd.status}</span>
+                  <span className="ds-history-time">{cmd.time}</span>
                 </div>
               </div>
             ))}

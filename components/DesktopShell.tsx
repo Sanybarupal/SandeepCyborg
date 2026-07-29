@@ -333,6 +333,11 @@ export function DesktopShell({ children }: { children: React.ReactNode }) {
         )}
       </AnimatePresence>
 
+      {/* ── Floating Action Button (Mic) ── */}
+      <Link href="/voice" className="fab-mic">
+        {Icons.mic}
+      </Link>
+
       {/* ── Mobile Menu Bar ── */}
       <nav className="ds-mobile-menubar">
         <Link href="/" className={`ds-mobile-item ${isActive('/') ? 'ds-mobile-item--active' : ''}`}>
@@ -345,16 +350,16 @@ export function DesktopShell({ children }: { children: React.ReactNode }) {
         </Link>
         
         {/* Center AI Button */}
-        <Link href="/voice" className="ds-mobile-item-center">
+        <Link href="/chat" className="ds-mobile-item-center">
            <div className="ds-mobile-ai-btn">
               <span className="ds-mobile-ai-text">AI</span>
               <div className="ds-mobile-ai-glow" />
            </div>
         </Link>
 
-        <Link href="/chat" className={`ds-mobile-item ${isActive('/chat') ? 'ds-mobile-item--active' : ''}`}>
-          <div className="ds-mobile-item-icon">{Icons.chat}</div>
-          <span className="ds-mobile-item-label">AI Chat</span>
+        <Link href="/voice" className={`ds-mobile-item ${isActive('/voice') ? 'ds-mobile-item--active' : ''}`}>
+          <div className="ds-mobile-item-icon">{Icons.mic}</div>
+          <span className="ds-mobile-item-label">Voice AI</span>
         </Link>
         <Link href="/settings" className={`ds-mobile-item ${isActive('/settings') ? 'ds-mobile-item--active' : ''}`}>
           <div className="ds-mobile-item-icon">{Icons.settings}</div>
