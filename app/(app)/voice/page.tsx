@@ -29,12 +29,12 @@ export default function VoicePage() {
     recognitionRef.current = new SpeechRecognition()
     recognitionRef.current.continuous = false
     recognitionRef.current.interimResults = true
-    recognitionRef.current.lang = 'en-US'
+    recognitionRef.current.lang = 'hi-IN'
 
     recognitionRef.current.onstart = () => {
       setTranscript('')
       setListening(true)
-      speak('Listening... Please tell me your command', false)
+      speak('सुन रहा हूँ... कृपया अपनी कमान्ड बताएं', false)
     }
 
     recognitionRef.current.onresult = (event: any) => {
@@ -60,7 +60,7 @@ export default function VoicePage() {
 
     recognitionRef.current.onerror = (event: any) => {
       console.error('Speech Recognition error:', event.error)
-      speak('Sorry, I did not understand. Please try again.', false)
+      speak('क्षमा करें, मुझे समझ नहीं आया। कृपया फिर से कोशिश करें।', false)
       setListening(false)
     }
 
@@ -73,11 +73,10 @@ export default function VoicePage() {
     }
   }, [])
 
-  // Text-to-Speech
+  // Text-to-Speech with Hindi support
   const speak = (text: string, isImportant = true) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
 
-    // Cancel any ongoing speech
     window.speechSynthesis.cancel()
 
     const utterance = new SpeechSynthesisUtterance(text)
@@ -85,58 +84,58 @@ export default function VoicePage() {
     utterance.pitch = 1.0
     utterance.volume = 1.0
 
-    // Try to use a natural voice
+    // Find Hindi voice or fallback
     const voices = window.speechSynthesis.getVoices()
-    const naturalVoice = voices.find(v => 
-      v.name.includes('Google') || 
-      v.name.includes('Natural') || 
-      v.name.includes('Neural')
-    )
+    let selectedVoice = voices.find(v => v.lang.includes('hi') || v.name.includes('Hindi'))
     
-    if (naturalVoice) {
-      utterance.voice = naturalVoice
+    if (!selectedVoice) {
+      selectedVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Natural'))
+    }
+    
+    if (selectedVoice) {
+      utterance.voice = selectedVoice
+      utterance.lang = 'hi-IN'
     }
 
     window.speechSynthesis.speak(utterance)
     synthRef.current = utterance
   }
 
-  // Handle voice commands
+  // Handle voice commands in Hindi
   const handleCommand = async (command: string) => {
     setIsProcessing(true)
     const lowerCmd = command.toLowerCase()
 
-    // Simulate command processing
     const newCommand = {
       command: command,
       status: 'processing',
-      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+      time: new Date().toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit' })
     }
 
     setCommandHistory(prev => [newCommand, ...prev])
 
-    // Simulate AI processing
     await new Promise(resolve => setTimeout(resolve, 1500))
 
-    // Update command status
     setCommandHistory(prev => 
       prev.map((cmd, idx) => 
         idx === 0 ? { ...cmd, status: 'completed' } : cmd
       )
     )
 
-    let response = 'Command processed successfully. '
+    let response = 'कमान्ड सफलतापूर्वक संसाधित हुई। '
     
-    if (lowerCmd.includes('report')) {
-      response = 'Your daily report has been generated and sent to all clients.'
-    } else if (lowerCmd.includes('meeting')) {
-      response = 'Meeting scheduled with Rahul Sharma for tomorrow at 2 PM.'
-    } else if (lowerCmd.includes('whatsapp')) {
-      response = 'I have analyzed WhatsApp conversations. No urgent issues found.'
-    } else if (lowerCmd.includes('revenue')) {
-      response = 'Revenue report for Q3 shows a 15% increase compared to Q2.'
+    if (lowerCmd.includes('रिपोर्ट') || lowerCmd.includes('report')) {
+      response = 'आपकी दैनिक रिपोर्ट तैयार कर दी गई है और सभी क्लाइंट्स को भेज दी गई है।'
+    } else if (lowerCmd.includes('मीटिंग') || lowerCmd.includes('meeting')) {
+      response = 'राहुल शर्मा के साथ कल सुबह 2 बजे मीटिंग शेड्यूल कर दी गई है।'
+    } else if (lowerCmd.includes('व्हाट्सएप') || lowerCmd.includes('whatsapp')) {
+      response = 'मैंने व्हाट्सएप की सभी बातचीत का विश्लेषण किया है। कोई तत्काल समस्या नहीं मिली।'
+    } else if (lowerCmd.includes('राजस्व') || lowerCmd.includes('revenue')) {
+      response = 'तीसरी तिमाही की राजस्व रिपोर्ट दूसरी तिमाही की तुलना में 15% बढ़ोतरी दिखाती है।'
+    } else if (lowerCmd.includes('क्लाइंट्स') || lowerCmd.includes('clients')) {
+      response = 'आपके पास कुल 1248 क्लाइंट्स हैं। इनमें से 1102 सक्रिय हैं।'
     } else {
-      response = 'I have processed your command: ' + command
+      response = 'आपकी कमान्ड प्रोसेस कर दी गई है।'
     }
 
     speak(response, true)

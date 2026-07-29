@@ -910,6 +910,264 @@ input { font-family: inherit; }
   .section-title {
     margin-bottom: 12px;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ULTRA MOBILE (max-width: 380px) - 300px width phones
+═══════════════════════════════════════════════════════════════ */
+@media (max-width: 380px) {
+  .ds-navbar {
+    padding: 0 8px;
+    height: 56px;
+  }
+  
+  .ds-main {
+    padding: 60px 0 72px 0;
+  }
+  
+  .page-container {
+    padding: 8px;
+  }
+  
+  .page-header {
+    margin-bottom: 12px;
+  }
+  
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .page-subtitle {
+    font-size: 12px;
+  }
+  
+  .dash-container {
+    padding: 8px;
+  }
+  
+  .glass-card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+  
+  /* Voice page mobile */
+  .ds-voice-main {
+    min-height: 280px;
+    padding: 16px;
+  }
+  
+  .ds-voice-mic-btn {
+    width: 72px;
+    height: 72px;
+  }
+  
+  .ds-voice-mic-btn svg {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .ds-voice-status {
+    font-size: 16px;
+  }
+  
+  .ds-voice-sub {
+    font-size: 11px;
+  }
+  
+  .ds-voice-history {
+    padding: 12px;
+  }
+  
+  .ds-history-cmd {
+    font-size: 12px;
+  }
+  
+  .ds-history-meta {
+    font-size: 10px;
+  }
+  
+  /* Clients page */
+  .ds-mobile-stat-card {
+    min-width: 130px !important;
+  }
+  
+  .dash-actions {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Reduce gaps */
+  .ds-voice-grid {
+    gap: 12px;
+  }
+  
+  /* Client list cards */
+  .ds-client-card {
+    padding: 12px;
+  }
+  
+  /* Smaller font sizes */
+  .text-sm {
+    font-size: 11px;
+  }
+  
+  .text-xs {
+    font-size: 10px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CLIENT CARDS & WHATSAPP INTEGRATION
+═══════════════════════════════════════════════════════════════ */
+.ds-mobile-client-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.ds-client-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(12, 17, 35, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  transition: all 0.3s ease;
+}
+
+.ds-client-card:hover {
+  background: rgba(12, 17, 35, 0.8);
+  border-color: rgba(79, 140, 255, 0.3);
+}
+
+.ds-client-card-top {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ds-client-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ds-client-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ds-client-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ds-client-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ds-client-tag {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.ds-client-badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.ds-badge-active {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--green);
+}
+
+.ds-badge-inactive {
+  background: rgba(100, 116, 139, 0.1);
+  color: var(--text-muted);
+}
+
+.ds-badge-pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--orange);
+}
+
+.ds-client-message-preview {
+  padding: 12px;
+  background: rgba(79, 140, 255, 0.05);
+  border-left: 3px solid var(--primary);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.ds-preview-lbl {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ds-client-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ds-client-action-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(79, 140, 255, 0.1);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+  border: 1px solid rgba(79, 140, 255, 0.2);
+  cursor: pointer;
+}
+
+.ds-client-action-btn:hover {
+  background: rgba(79, 140, 255, 0.2);
+  border-color: rgba(79, 140, 255, 0.4);
+}
+
+.ds-client-action-btn-whatsapp {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--green);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.ds-client-action-btn-whatsapp:hover {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.ds-client-action-btn-ai {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--purple-light);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.ds-client-action-btn-ai:hover {
+  background: rgba(139, 92, 246, 0.2);
+}
   
   /* AI Core Layout */
   .ds-mobile-ai-core {
@@ -1371,11 +1629,15 @@ input { font-family: inherit; }
   }
   .ds-dot:nth-child(1) { animation-delay: -0.32s; }
   .ds-dot:nth-child(2) { animation-delay: -0.16s; }
-}
 
 @keyframes typeDot {
   0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
   40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes waveAnim {
+  0%, 100% { height: 6px; }
+  50% { height: 28px; }
 }
 
 /* Mobile Side Drawer */

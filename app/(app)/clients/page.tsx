@@ -3,12 +3,66 @@ import { useState } from 'react'
 import { Icons } from '@/components/Icons'
 
 const mockClients = [
-  { name: 'Rahul Sharma', email: 'rahul@example.com', status: 'active', tag: 'Premium', lastActive: '2 hours ago', messages: 42 },
-  { name: 'Priya Patel', email: 'priya@example.com', status: 'active', tag: 'Enterprise', lastActive: '5 min ago', messages: 128 },
-  { name: 'Amit Kumar', email: 'amit@example.com', status: 'inactive', tag: 'Starter', lastActive: '3 days ago', messages: 8 },
-  { name: 'Sarah Johnson', email: 'sarah@corp.com', status: 'active', tag: 'Enterprise', lastActive: '1 hour ago', messages: 67 },
-  { name: 'Mike Chen', email: 'mike@tech.io', status: 'active', tag: 'Premium', lastActive: '30 min ago', messages: 93 },
-  { name: 'Lisa Wang', email: 'lisa@design.co', status: 'pending', tag: 'Trial', lastActive: '1 day ago', messages: 15 },
+  { 
+    name: 'Rahul Sharma', 
+    email: 'rahul@example.com', 
+    status: 'active', 
+    tag: 'Premium', 
+    lastActive: '2 hours ago', 
+    messages: 42,
+    lastMessage: 'Hey Sandeep, are we still on for the meeting tomorrow?',
+    whatsappStatus: 'active'
+  },
+  { 
+    name: 'Priya Patel', 
+    email: 'priya@example.com', 
+    status: 'active', 
+    tag: 'Enterprise', 
+    lastActive: '5 min ago', 
+    messages: 128,
+    lastMessage: 'The project is looking great! Can you share the latest updates?',
+    whatsappStatus: 'active'
+  },
+  { 
+    name: 'Amit Kumar', 
+    email: 'amit@example.com', 
+    status: 'inactive', 
+    tag: 'Starter', 
+    lastActive: '3 days ago', 
+    messages: 8,
+    lastMessage: 'Thank you for the support!',
+    whatsappStatus: 'offline'
+  },
+  { 
+    name: 'Sarah Johnson', 
+    email: 'sarah@corp.com', 
+    status: 'active', 
+    tag: 'Enterprise', 
+    lastActive: '1 hour ago', 
+    messages: 67,
+    lastMessage: 'Looking forward to our discussion next week.',
+    whatsappStatus: 'active'
+  },
+  { 
+    name: 'Mike Chen', 
+    email: 'mike@tech.io', 
+    status: 'active', 
+    tag: 'Premium', 
+    lastActive: '30 min ago', 
+    messages: 93,
+    lastMessage: 'Perfect! Let&apos;s proceed with the plan.',
+    whatsappStatus: 'active'
+  },
+  { 
+    name: 'Lisa Wang', 
+    email: 'lisa@design.co', 
+    status: 'pending', 
+    tag: 'Trial', 
+    lastActive: '1 day ago', 
+    messages: 15,
+    lastMessage: 'When is a good time to discuss the proposal?',
+    whatsappStatus: 'away'
+  },
 ]
 
 export default function ClientsPage() {
@@ -79,14 +133,20 @@ export default function ClientsPage() {
               </span>
             </div>
             
-            <div className="ds-client-message-preview">
-              <span className="ds-preview-lbl">Last Message:</span> "Hey Sandeep, are we still on for the meeting tomorrow?"
+            <div className="ds-client-message-preview" style={{ marginBottom: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <span className="ds-preview-lbl" style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>WhatsApp - {client.whatsappStatus}</span>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontStyle: 'italic' }}>"{client.lastMessage}"</span>
             </div>
             
             <div className="ds-client-card-actions">
-               <button className="ds-client-action-btn">{Icons.phone} Call</button>
-               <button className="ds-client-action-btn ds-client-action-btn-whatsapp">{Icons.whatsapp} WhatsApp</button>
-               <button className="ds-client-action-btn ds-client-action-btn-ai">{Icons.bolt} AI Reply</button>
+               <button className="ds-client-action-btn" style={{ flex: 1 }}>{Icons.phone} Call</button>
+               <button 
+                 className="ds-client-action-btn ds-client-action-btn-whatsapp" 
+                 style={{ flex: 1, background: 'rgba(34, 197, 94, 0.1)', color: 'var(--green)' }}
+               >
+                 {Icons.whatsapp} Chat
+               </button>
+               <button className="ds-client-action-btn ds-client-action-btn-ai" style={{ flex: 1 }}>{Icons.bolt} AI</button>
             </div>
           </div>
         ))}
