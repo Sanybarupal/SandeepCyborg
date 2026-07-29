@@ -44,64 +44,81 @@ export default function VoiceAssistant() {
   }, [isListening])
 
   const handleVoiceCommand = async (command: string) => {
-    if (command.includes('hi sandeep') || command.includes('hi saibo') || command.includes('hello sandeep')) {
+    const lowerCmd = command.toLowerCase().trim()
+    
+    // Greeting commands
+    if (lowerCmd.includes('hi sandeep') || lowerCmd.includes('hi saibo') || lowerCmd.includes('hello sandeep')) {
       speak('Hello sir. How can I assist you with your business today?')
       return
     }
     
-    if (command.includes('open dashboard')) {
+    // Navigation commands
+    if (lowerCmd.includes('open dashboard') || lowerCmd.includes('go to dashboard')) {
       speak('Opening dashboard')
-      router.push('/dashboard')
-    } else if (command.includes('open clients')) {
-      speak('Opening clients')
-      router.push('/clients')
-    } else if (command.includes('open ai chat') || command.includes('open chat')) {
+      setTimeout(() => router.push('/dashboard'), 800)
+    } else if (lowerCmd.includes('open clients')) {
+      speak('Opening clients page')
+      setTimeout(() => router.push('/clients'), 800)
+    } else if (lowerCmd.includes('open ai chat') || lowerCmd.includes('open chat')) {
       speak('Opening AI chat')
-      router.push('/chat')
-    } else if (command.includes('open approvals')) {
+      setTimeout(() => router.push('/chat'), 800)
+    } else if (lowerCmd.includes('open approvals')) {
       speak('Opening approvals')
-      router.push('/approvals')
-    } else if (command.includes('open upload')) {
+      setTimeout(() => router.push('/approvals'), 800)
+    } else if (lowerCmd.includes('open upload')) {
       speak('Opening upload page')
-      router.push('/upload')
-    } else if (command.includes('open settings')) {
+      setTimeout(() => router.push('/upload'), 800)
+    } else if (lowerCmd.includes('open settings')) {
       speak('Opening settings')
-      router.push('/settings')
-    } else if (command.includes('stop listening')) {
+      setTimeout(() => router.push('/settings'), 800)
+    } else if (lowerCmd.includes('open voice')) {
+      speak('Opening voice AI')
+      setTimeout(() => router.push('/voice'), 800)
+    } else if (lowerCmd.includes('stop listening')) {
       speak('Voice assistant paused')
       toggleListening(false)
     } else {
-      // Simulate passing to an LLM
-      console.log('Sending to AI backend:', command)
-      // Normally, here we would fetch from our /api/chat backend.
-      // For now, if we don't recognize a command, we give a default AI response:
-      if (command.length > 5 && !command.includes('sandeep') && !command.includes('saibo')) {
-         speak('I am processing your request. Please wait.')
-         setTimeout(() => {
-            speak('I have recorded your command.')
-         }, 2000)
-      }
+      // AI Response for general queries
+      speak('I am processing your request. Please wait.')
+      console.log('[Voice] Command received:', command)
+      
+      // Simulate AI processing
+      setTimeout(() => {
+        let response = 'I have processed your command.'
+        
+        if (lowerCmd.includes('report')) response = 'I will generate the report for you.'
+        else if (lowerCmd.includes('client')) response = 'Accessing client information.'
+        else if (lowerCmd.includes('whatsapp')) response = 'Checking WhatsApp messages.'
+        else if (lowerCmd.includes('email')) response = 'Checking your emails.'
+        else if (lowerCmd.includes('meeting')) response = 'I can help schedule a meeting for you.'
+        
+        speak(response)
+      }, 1200)
     }
   }
 
   const speak = (text: string) => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel()
+      
       const utterance = new SpeechSynthesisUtterance(text)
       
-      // Try to find a more natural/human voice (e.g. Google or Microsoft natural voices)
+      // Try to find a more natural/human voice
       const voices = window.speechSynthesis.getVoices()
-      // Fallback to finding male English voices which tend to sound closer to the desired outcome
-      let selectedVoice = voices.find(v => v.name.includes('Google UK English Male') || v.name.includes('Google US English'))
-      if (!selectedVoice) {
-        selectedVoice = voices.find(v => v.name.includes('Natural') || v.name.includes('Neural'))
-      }
+      let selectedVoice = voices.find(v => 
+        v.name.includes('Google') || 
+        v.name.includes('Neural') || 
+        v.name.includes('Natural')
+      )
       
       if (selectedVoice) {
         utterance.voice = selectedVoice
       }
 
-      utterance.rate = 1.05 // Slightly faster for natural feel
-      utterance.pitch = 0.9 // Slightly lower pitch for deeper male voice
+      utterance.rate = 1.0 // Natural speed
+      utterance.pitch = 1.0 // Natural pitch
+      utterance.volume = 1.0 // Full volume
+      
       window.speechSynthesis.speak(utterance)
     }
   }
