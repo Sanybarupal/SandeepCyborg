@@ -1,21 +1,20 @@
 """
 Sandeep Clone — AI Brain
-GPT-4o se connected. Aapki personality ke saath baat karta hai.
-Agar OpenAI key nahi hai toh smart mock mode mein kaam karta hai.
+Gemini se connected. Aapki personality ke saath baat karta hai.
+Agar API key nahi hai toh smart mock mode mein kaam karta hai.
 """
 import json
 import random
 from datetime import datetime
-from config import OPENAI_API_KEY, AI_MODEL, AI_MOCK_MODE
+from config import GEMINI_API_KEY, AI_MODEL, AI_MOCK_MODE
 from ai.persona import SANDEEP_PERSONA, GREETING
 
-# Try to import OpenAI
 try:
-    from openai import OpenAI
-    _openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
+    from google import genai
+    from google.genai import types
+    _genai_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 except ImportError:
-    _openai_client = None
-
+    _genai_client = None
 
 # ─── Mock Responses (when no API key) ─────────────
 MOCK_RESPONSES = [
@@ -28,7 +27,7 @@ MOCK_RESPONSES = [
 ]
 
 def _mock_response(user_message: str, client_context: dict = None) -> str:
-    """Smart mock response when no OpenAI key."""
+    """Smart mock response when no Gemini key."""
     msg_lower = user_message.lower()
 
     if any(word in msg_lower for word in ["kya haal", "kaisa hai", "how are", "hello", "hi", "namaste"]):
@@ -47,25 +46,17 @@ def _mock_response(user_message: str, client_context: dict = None) -> str:
 
 
 def _build_context_messages(history: list, client: dict = None) -> list:
-    """Build message list for OpenAI API."""
-    messages = [{"role": "system", "content": SANDEEP_PERSONA}]
-
-    if client:
-        client_context = f"""
-## Current Client Context:
-- Name: {client.get('name', 'Unknown')}
-- Company: {client.get('company', 'N/A')}
-- Requirement: {client.get('requirement', 'N/A')}
-- Status: {client.get('status', 'lead')}
-- Platform: {client.get('platform', 'direct')}
-"""
-        messages.append({"role": "system", "content": client_context})
-
+    """Build message list for Gemini API."""
+    # Note: Gemini system instructions are usually passed differently,
+    # but we can structure them as 'user' and 'model' turns, or use the `system_instruction` config.
+    messages = []
+    
     # Add conversation history (last 10 messages)
     for msg in history[-10:]:
-        role = "user" if msg["role"] == "user" else "assistant"
-        messages.append({"role": role, "content": msg["content"]})
-
+        role = "user" if msg["role"] == "user" else "model"
+        # Combine sequential same-role messages if needed, but SDK usually handles it
+        messages.append(types.Content(role=role, parts=[types.Part.from_text(text=msg["content"])]))
+        
     return messages
 
 
@@ -75,13 +66,13 @@ def generate_response(
     client: dict = None
 ) -> dict:
     """
-    Main function: Generate AI response.
+    Main function: Generate AI response using Gemini.
     Returns dict with response text, mode, and metadata.
     """
     history = history or []
 
     # ─── Mock Mode ─────────────────────────────────
-    if AI_MOCK_MODE or not _openai_client:
+    if AI_MOCK_MODE or not _genai_client:
         response_text = _mock_response(user_message, client)
         return {
             "response": response_text,
@@ -91,24 +82,33 @@ def generate_response(
             "timestamp": datetime.utcnow().isoformat(),
         }
 
-    # ─── Real GPT-4 Mode ───────────────────────────
+    # ─── Real Gemini Mode ───────────────────────────
     try:
         messages = _build_context_messages(history, client)
-        messages.append({"role": "user", "content": user_message})
+        messages.append(types.Content(role="user", parts=[types.Part.from_text(text=user_message)]))
+        
+        system_instruction = SANDEEP_PERSONA
+        if client:
+            system_instruction += f"\n\n## Current Client Context:\n- Name: {client.get('name', 'Unknown')}\n- Company: {client.get('company', 'N/A')}\n- Requirement: {client.get('requirement', 'N/A')}\n- Status: {client.get('status', 'lead')}\n- Platform: {client.get('platform', 'direct')}"
 
-        completion = _openai_client.chat.completions.create(
-            model=AI_MODEL,
-            messages=messages,
-            max_tokens=500,
+        config = types.GenerateContentConfig(
+            system_instruction=system_instruction,
             temperature=0.7,
+            max_output_tokens=500
         )
 
-        response_text = completion.choices[0].message.content
-        tokens = completion.usage.total_tokens if completion.usage else 0
+        response = _genai_client.models.generate_content(
+            model=AI_MODEL,
+            contents=messages,
+            config=config,
+        )
+
+        response_text = response.text
+        tokens = response.usage_metadata.total_token_count if response.usage_metadata else 0
 
         return {
             "response": response_text,
-            "mode": "gpt4",
+            "mode": "gemini",
             "model": AI_MODEL,
             "tokens_used": tokens,
             "timestamp": datetime.utcnow().isoformat(),

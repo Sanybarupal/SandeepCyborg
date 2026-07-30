@@ -150,6 +150,27 @@ class Notification(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+class Memory(Base):
+    __tablename__ = "memories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    client_id = Column(Integer, nullable=True) # If null, it's a global memory
+    context = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class WhatsAppMessage(Base):
+    __tablename__ = "whatsapp_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    remote_jid = Column(String(100), index=True)
+    message = Column(Text)
+    is_from_me = Column(Boolean, default=False)
+    has_media = Column(Boolean, default=False)
+    timestamp = Column(Integer)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
 # ─── Init ──────────────────────────────────────────
 
 def init_db():

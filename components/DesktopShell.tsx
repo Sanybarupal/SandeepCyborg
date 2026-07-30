@@ -50,7 +50,7 @@ export function DesktopShell({ children }: { children: React.ReactNode }) {
   const sidebarWidth = collapsed ? 72 : 260
 
   return (
-    <div className="ds-root">
+    <div className="desktop-shell ds-root">
       {/* ── Animated Background ── */}
       <div className="ds-bg">
         <div className="ds-bg-grid" />
@@ -71,7 +71,7 @@ export function DesktopShell({ children }: { children: React.ReactNode }) {
 
       {/* ── Sidebar ── */}
       <motion.aside
-        className="ds-sidebar"
+        className="ds-sidebar premium-sidebar"
         animate={{ width: sidebarWidth }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
       >
@@ -180,7 +180,7 @@ export function DesktopShell({ children }: { children: React.ReactNode }) {
 
       {/* ── Top Navbar ── */}
       <motion.header
-        className="ds-navbar"
+        className="ds-navbar premium-top-nav"
         animate={{ left: sidebarWidth }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
       >
@@ -197,16 +197,13 @@ export function DesktopShell({ children }: { children: React.ReactNode }) {
           <div className="ds-nav-search-kbd">⌘K</div>
         </div>
 
-        {/* Mobile Left: Menu Toggle & Logo */}
+        {/* Mobile Left: Greeting & AI Status */}
         <div className="ds-nav-mobile-left">
-           <button className="ds-nav-btn ds-mobile-menu-btn" onClick={() => setMobileMenuOpen(true)}>
-             {Icons.menu}
-           </button>
            <div className="ds-sb-logo ds-mobile-logo">
              <div className="ds-sb-logo-icon">{Icons.bolt}</div>
              <div className="ds-sb-logo-text">
-               <span className="ds-sb-logo-name">Sandeep <span className="ds-sb-logo-accent">Clone</span></span>
-               <span className="ds-sb-logo-badge">AI OS</span>
+               <span className="ds-sb-logo-name">Hi, Sandeep</span>
+               <span className="ds-sb-logo-badge">AI ONLINE</span>
              </div>
            </div>
         </div>
@@ -228,6 +225,14 @@ export function DesktopShell({ children }: { children: React.ReactNode }) {
           {/* Desktop Voice */}
           <button className="ds-nav-btn ds-nav-btn--voice ds-desktop-only" title="Voice AI">
             {Icons.mic}
+          </button>
+
+          {/* Mobile Shortcuts */}
+          <Link href="/voice" className="ds-nav-btn ds-nav-btn--voice ds-mobile-action" title="Voice AI">
+            {Icons.mic}
+          </Link>
+          <button className="ds-nav-btn ds-mobile-action" title="Search" onClick={() => setMobileMenuOpen(true)}>
+            {Icons.search}
           </button>
 
           {/* Theme (Desktop) */}
@@ -359,7 +364,7 @@ export function DesktopShell({ children }: { children: React.ReactNode }) {
 
         <Link href="/voice" className={`ds-mobile-item ${isActive('/voice') ? 'ds-mobile-item--active' : ''}`}>
           <div className="ds-mobile-item-icon">{Icons.mic}</div>
-          <span className="ds-mobile-item-label">Voice AI</span>
+          <span className="ds-mobile-item-label">Voice</span>
         </Link>
         <Link href="/settings" className={`ds-mobile-item ${isActive('/settings') ? 'ds-mobile-item--active' : ''}`}>
           <div className="ds-mobile-item-icon">{Icons.settings}</div>

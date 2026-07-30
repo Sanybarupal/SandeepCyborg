@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { DesktopShell } from '../components/DesktopShell'
+import { MobileShell } from '../components/MobileShell'
 
 export const metadata: Metadata = {
   title: 'Sandeep Clone — AI Operating System',
@@ -29,6 +30,9 @@ export default function RootLayout({
         <DesktopShell>
           {children}
         </DesktopShell>
+        <MobileShell>
+          {children}
+        </MobileShell>
       </body>
     </html>
   )

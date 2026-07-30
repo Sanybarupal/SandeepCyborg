@@ -1,5 +1,5 @@
 import json
-from ai.brain import _openai_client, _mock_response
+from ai.brain import _genai_client, _mock_response
 from config import AI_MODEL, AI_MOCK_MODE
 from datetime import datetime
 
@@ -37,41 +37,47 @@ RESPONSE FORMAT (Strict JSON string):
 
 def process_whatsapp_message(user_message: str, client_context: dict, history: list) -> dict:
     """
-    Process an incoming WhatsApp message, extract client info, and generate a reply.
+    Process an incoming WhatsApp message, extract client info, and generate a reply using Gemini.
     """
     # ─── Mock Mode ─────────────────────────────────
-    if AI_MOCK_MODE or not _openai_client:
+    if AI_MOCK_MODE or not _genai_client:
         reply = _mock_response(user_message, client_context)
         return {
             "extracted_info": {},
             "reply_message": reply
         }
 
-    # ─── Real GPT-4 Mode ───────────────────────────
+    # ─── Real Gemini Mode ───────────────────────────
     try:
-        messages = [{"role": "system", "content": WHATSAPP_SYSTEM_PROMPT}]
+        from google.genai import types
         
-        # Add client context
-        context_str = f"CURRENT KNOWN DETAILS:\n{json.dumps(client_context, indent=2)}\n\n"
-        context_str += "Aapko in known details ko overwrite nahi karna hai agar nayi details na milein."
-        messages.append({"role": "system", "content": context_str})
-
+        messages = []
+        
         # Add history
         for msg in history[-10:]:
-            role = "user" if msg["role"] == "user" else "assistant"
-            # Ignore non user/assistant roles or wrap them
-            messages.append({"role": role, "content": msg["content"]})
+            role = "user" if msg["role"] == "user" else "model"
+            messages.append(types.Content(role=role, parts=[types.Part.from_text(text=msg["content"])]))
             
-        messages.append({"role": "user", "content": user_message})
+        messages.append(types.Content(role="user", parts=[types.Part.from_text(text=user_message)]))
+        
+        # Add client context to system instruction
+        system_instruction = WHATSAPP_SYSTEM_PROMPT
+        system_instruction += f"\n\nCURRENT KNOWN DETAILS:\n{json.dumps(client_context, indent=2)}\n\n"
+        system_instruction += "Aapko in known details ko overwrite nahi karna hai agar nayi details na milein."
 
-        completion = _openai_client.chat.completions.create(
-            model=AI_MODEL,
-            messages=messages,
-            response_format={"type": "json_object"},
+        config = types.GenerateContentConfig(
+            system_instruction=system_instruction,
             temperature=0.7,
+            response_mime_type="application/json"
         )
 
-        response_text = completion.choices[0].message.content
+        response = _genai_client.models.generate_content(
+            model=AI_MODEL,
+            contents=messages,
+            config=config,
+        )
+
+        response_text = response.text
         parsed = json.loads(response_text)
         
         return {
