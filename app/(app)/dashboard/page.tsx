@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { Icons } from '@/components/Icons'
 
 function useCounter(target: number, duration = 2000) {
@@ -92,13 +93,20 @@ export default function DashboardPage() {
   ]
 
   const quickActions = [
-    { icon: Icons.whatsapp, label: 'WhatsApp', color: 'green' },
-    { icon: Icons.chat, label: 'AI Chat', color: 'purple' },
-    { icon: Icons.mic, label: 'Voice AI', color: 'cyan' },
-    { icon: Icons.globe, label: 'Web Builder', color: 'blue' },
-    { icon: Icons.upload, label: 'Upload', color: 'orange' },
-    { icon: Icons.shield, label: 'Approvals', color: 'green' },
+    { icon: Icons.whatsapp, label: 'WhatsApp', color: 'green', href: '/whatsapp' },
+    { icon: Icons.chat, label: 'AI Chat', color: 'purple', href: '/chat' },
+    { icon: Icons.mic, label: 'Voice AI', color: 'cyan', href: '/voice' },
+    { icon: Icons.globe, label: 'Web Builder', color: 'blue', href: '/website-builder' },
+    { icon: Icons.upload, label: 'Upload', color: 'orange', href: '/upload' },
+    { icon: Icons.shield, label: 'Approvals', color: 'green', href: '/approvals' },
   ]
+
+  const getGreeting = () => {
+    const h = new Date().getHours()
+    if (h < 12) return 'Good Morning'
+    if (h < 17) return 'Good Afternoon'
+    return 'Good Evening'
+  }
 
   return (
     <div className="dash-container">
@@ -107,7 +115,7 @@ export default function DashboardPage() {
         <div className="dash-greeting-left">
           <div>
             <span className="dash-greeting-wave">👋</span>{' '}
-            <span className="dash-greeting-title">Good Morning, <span className="gradient-text">Sandeep</span></span>
+            <span className="dash-greeting-title">{getGreeting()}, <span className="gradient-text">Sandeep</span></span>
           </div>
           <div className="dash-greeting-sub">Welcome back to your AI Operating System</div>
         </div>
@@ -165,10 +173,10 @@ export default function DashboardPage() {
             <div className="section-title">QUICK ACTIONS</div>
             <div className="dash-actions">
               {quickActions.map((a, i) => (
-                <div key={i} className="dash-action">
+                <Link key={i} href={a.href} className="dash-action" style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div className={`dash-action-icon dai--${a.color}`}>{a.icon}</div>
                   <div className="dash-action-lbl">{a.label}</div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -200,7 +208,7 @@ export default function DashboardPage() {
             </div>
             <div className="dash-ai-listen">Listening...</div>
             <div className="dash-ai-prompt">How can I assist you today?</div>
-            <button className="dash-ai-speak-btn">{Icons.mic} Speak Now</button>
+            <Link href="/voice" className="dash-ai-speak-btn" style={{ textDecoration: 'none', color: 'inherit' }}>{Icons.mic} Speak Now</Link>
           </div>
 
           {/* Recent Activity */}

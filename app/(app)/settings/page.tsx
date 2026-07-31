@@ -47,17 +47,13 @@ function Section({ title, icon, children }: { title: string; icon: React.ReactNo
       border: '1px solid var(--border)', borderRadius: 'var(--radius)',
       overflow: 'hidden', marginBottom: 20,
     }}>
-      <div style={{
-        padding: '18px 24px', borderBottom: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center', gap: 10,
-        background: 'rgba(255,255,255,0.02)',
-      }}>
+      <div className="settings-section-header">
         <div style={{ color: 'var(--primary)' }}>{icon}</div>
         <span style={{ fontFamily: 'var(--font-hero)', fontSize: 11, fontWeight: 600, letterSpacing: '1.5px', color: 'var(--text-muted)' }}>
           {title}
         </span>
       </div>
-      <div style={{ padding: '0 24px' }}>
+      <div className="settings-section-body">
         {children}
         {/* remove last border */}
         <div style={{ height: 1 }} />
@@ -94,7 +90,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div className="settings-grid">
         {/* Left Column */}
         <div>
           {/* Profile */}
@@ -200,10 +196,7 @@ export default function SettingsPage() {
           </Section>
 
           {/* Danger Zone */}
-          <div style={{
-            background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.15)',
-            borderRadius: 'var(--radius)', padding: 24,
-          }}>
+          <div className="settings-danger-zone">
             <div style={{ fontFamily: 'var(--font-hero)', fontSize: 11, letterSpacing: '1.5px', color: 'var(--red)', marginBottom: 16 }}>DANGER ZONE</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
