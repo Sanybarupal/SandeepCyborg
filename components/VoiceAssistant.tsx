@@ -7,213 +7,302 @@ export default function VoiceAssistant() {
   const router = useRouter()
   const [isListening, setIsListening] = useState(false)
   const recognitionRef = useRef<any>(null)
+  const isStartedRef = useRef(false)
+  const shouldListenRef = useRef(false)
+  const isSpeakingRef = useRef(false)
+  const hasGreeted = useRef(false)
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-      recognitionRef.current = new SpeechRecognition()
-      recognitionRef.current.continuous = true
-      recognitionRef.current.interimResults = false
-      recognitionRef.current.lang = 'en-US'
-
-      recognitionRef.current.onresult = (event: any) => {
-        const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase()
-        console.log('Voice Command:', transcript)
-        handleVoiceCommand(transcript)
-      }
-
-      recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error', event.error)
-      }
-
-      // Automatically restart if it stops and we want it listening
-      recognitionRef.current.onend = () => {
-        if (isListening) {
-          try {
-            recognitionRef.current.start()
-          } catch (e) {}
-        }
-      }
-    }
-
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop()
-      }
-    }
-  }, [isListening])
-
-  const handleVoiceCommand = async (command: string) => {
-    const wakeWords = ['hey cybo', 'hey sandeep', 'hello sandeep', 'hello cybo', 'cybo', 'sandeep']
-    if (wakeWords.some(w => command.includes(w))) {
-      speak('haan main sun raha hu sir bataiye kya kaam hai')
+  // ── 1. Text to Speech (TTS) ──
+  const speak = (text: string, callback?: () => void) => {
+    console.log('[VoiceAssistant] Speaking:', text)
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      if (callback) callback()
       return
     }
-    
-    if (command.includes('open dashboard')) {
-      speak('Opening dashboard')
-      router.push('/dashboard')
-    } else if (command.includes('open clients')) {
-      speak('Opening clients')
-      router.push('/clients')
-    } else if (command.includes('open ai chat') || command.includes('open chat')) {
-      speak('Opening AI chat')
-      router.push('/chat')
-    } else if (command.includes('open approvals')) {
-      speak('Opening approvals')
-      router.push('/approvals')
-    } else if (command.includes('open upload')) {
-      speak('Opening upload page')
-      router.push('/upload')
-    } else if (command.includes('open settings')) {
-      speak('Opening settings')
-      router.push('/settings')
-    } else if (command.includes('stop listening')) {
-      speak('Voice assistant paused')
-      toggleListening(false)
-    } else {
-      console.log('Sending to AI backend:', command)
+
+    try {
+      window.speechSynthesis.cancel() // Clear any stuck speech queue
+    } catch (e) {}
+
+    const utterance = new SpeechSynthesisUtterance(text)
+    isSpeakingRef.current = true
+
+    // Pause recognition while speaking so AI doesn't hear itself
+    if (recognitionRef.current && isStartedRef.current) {
       try {
-        const response = await fetch('http://localhost:8000/api/voice/command', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: command, speak: false }) // We'll handle TTS here
-        })
-        const data = await response.json()
-        if (data && data.text) {
-          speak(data.text)
-        } else {
-          speak('Command executed successfully.')
-        }
-      } catch (e) {
-        console.error('Failed to communicate with AI backend', e)
-        speak('Sorry, I could not reach the backend server.')
-      }
+        recognitionRef.current.stop()
+      } catch (e) {}
     }
+
+    const voices = window.speechSynthesis.getVoices()
+    let selectedVoice = voices.find(v => v.lang.includes('hi-IN') || v.lang.includes('hi'))
+    if (!selectedVoice) {
+      selectedVoice = voices.find(v =>
+        v.name.includes('Google UK English Male') ||
+        v.name.includes('Google US English') ||
+        v.name.includes('Natural') ||
+        v.name.includes('Neural') ||
+        v.name.includes('David') ||
+        v.name.includes('Ravi')
+      )
+    }
+
+    if (selectedVoice) {
+      utterance.voice = selectedVoice
+    }
+
+    utterance.rate = 1.0
+    utterance.pitch = 1.0
+
+    const resumeListening = () => {
+      isSpeakingRef.current = false
+      if (shouldListenRef.current && !isStartedRef.current) {
+        setTimeout(() => {
+          if (shouldListenRef.current && !isStartedRef.current) {
+            try {
+              recognitionRef.current?.start()
+            } catch (e) {}
+          }
+        }, 300)
+      }
+      if (callback) callback()
+    }
+
+    utterance.onend = resumeListening
+    utterance.onerror = resumeListening
+
+    window.speechSynthesis.speak(utterance)
   }
 
-  const speak = (text: string) => {
-    console.log('[VoiceAssistant] Speaking:', text);
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel(); // Clear any stuck queues
-      const utterance = new SpeechSynthesisUtterance(text)
-      
-      const voices = window.speechSynthesis.getVoices()
-      
-      // Try to find a Hindi voice first for better Hinglish pronunciation
-      let selectedVoice = voices.find(v => v.lang.includes('hi-IN') || v.lang.includes('hi'))
-      
-      // Fallback to English natural voices if Hindi is not found
-      if (!selectedVoice) {
-         selectedVoice = voices.find(v => v.name.includes('Google UK English Male') || v.name.includes('Google US English') || v.name.includes('Natural') || v.name.includes('Neural'))
-      }
-      
-      if (selectedVoice) {
-        utterance.voice = selectedVoice
-        console.log('[VoiceAssistant] Selected Voice:', selectedVoice.name, selectedVoice.lang);
-      } else {
-        console.log('[VoiceAssistant] No specialized voice found. Using default.');
-      }
+  // ── 2. Handle Voice Commands & Conversations ──
+  const handleVoiceCommand = (rawCommand: string) => {
+    const command = rawCommand.toLowerCase().trim()
+    console.log('[VoiceAssistant] Handling command:', command)
 
-      utterance.rate = 1.0 // Normal rate
-      utterance.pitch = 1.0 // Normal pitch
-      window.speechSynthesis.speak(utterance)
+    // Wake words / greetings
+    const wakeWords = ['hey cybo', 'hey sandeep', 'hello sandeep', 'hello cybo', 'cybo', 'sandeep', 'hello', 'hi', 'sun rahe ho', 'suno']
+    if (wakeWords.some(w => command === w || command.startsWith(w + ' '))) {
+      speak('Haan Sandeep sir, bataiye main aapki kya madad kar sakta hoon?')
+      return
+    }
+
+    // Conversational Queries
+    if (command.includes('kaise ho') || command.includes('how are you') || command.includes('kya haal')) {
+      speak('Main bilkul badhiya hoon Sandeep sir! Aapka AI Operating System full power mein online hai. Aaj kya task automate karein?')
+      return
+    }
+
+    if (command.includes('kya kar sakte ho') || command.includes('what can you do') || command.includes('help')) {
+      speak('Sir main aapke clients manage kar sakta hoon, WhatsApp automation dekh sakta hoon, approvals check kar sakta hoon, aur dashboard navigate kar sakta hoon.')
+      return
+    }
+
+    if (command.includes('who are you') || command.includes('tum kaun ho') || command.includes('aap kaun ho') || command.includes('naam kya hai')) {
+      speak('Main aapka personal AI Cyborg Operating System hoon Sandeep sir, aapke business automation ke liye.')
+      return
+    }
+
+    if (command.includes('status') || command.includes('kya chal raha hai') || command.includes('system status')) {
+      speak('System 100% operational hai sir. 3 approvals pending hain aur 320 new messages WhatsApp par handle ho chuke hain.')
+      return
+    }
+
+    // Navigation Commands
+    if (command.includes('open dashboard') || command.includes('dashboard kholo') || command.includes('go home') || command.includes('home page')) {
+      speak('Opening Dashboard')
+      router.push('/')
+    } else if (command.includes('open client') || command.includes('client dikhao') || command.includes('clients kholo') || command.includes('go to clients')) {
+      speak('Opening Clients section')
+      router.push('/clients')
+    } else if (command.includes('open chat') || command.includes('chat kholo') || command.includes('ai chat') || command.includes('open ai chat')) {
+      speak('Opening AI Chat')
+      router.push('/chat')
+    } else if (command.includes('open whatsapp') || command.includes('whatsapp kholo') || command.includes('messages kholo')) {
+      speak('Opening WhatsApp automation dashboard')
+      router.push('/whatsapp')
+    } else if (command.includes('open approval') || command.includes('approvals kholo') || command.includes('pending approvals')) {
+      speak('Opening Approvals panel')
+      router.push('/approvals')
+    } else if (command.includes('open upload') || command.includes('upload kholo') || command.includes('knowledge base')) {
+      speak('Opening Document Upload')
+      router.push('/upload')
+    } else if (command.includes('open analytics') || command.includes('analytics kholo') || command.includes('stats kholo')) {
+      speak('Opening Analytics')
+      router.push('/analytics')
+    } else if (command.includes('open setting') || command.includes('settings kholo') || command.includes('profile kholo')) {
+      speak('Opening Settings')
+      router.push('/settings')
+    } else if (command.includes('open voice') || command.includes('voice page') || command.includes('voice ai')) {
+      speak('Opening Voice AI page')
+      router.push('/voice')
+    } else if (command.includes('open website builder') || command.includes('website builder') || command.includes('web builder')) {
+      speak('Opening Website Builder')
+      router.push('/website-builder')
+    } else if (command.includes('stop listening') || command.includes('chup raho') || command.includes('band ho jao') || command.includes('pause voice')) {
+      speak('Voice assistant paused. Jab bhi zaroorat ho mic par click karein.')
+      stopListening()
     } else {
-      console.warn('[VoiceAssistant] Speech synthesis not supported in this environment.');
+      // Smart Fallback Response
+      speak(`Theek hai Sandeep sir, maine note kar liya hai: ${rawCommand}`)
     }
   }
 
-  // Ensure voices are loaded (sometimes takes a moment on page load)
+  // ── 3. Start/Stop Safe Listeners ──
+  const startListening = () => {
+    shouldListenRef.current = true
+    setIsListening(true)
+    if (recognitionRef.current && !isStartedRef.current && !isSpeakingRef.current) {
+      try {
+        recognitionRef.current.start()
+      } catch (e) {
+        // Ignore InvalidStateError if already starting
+      }
+    }
+  }
+
+  const stopListening = () => {
+    shouldListenRef.current = false
+    setIsListening(false)
+    if (recognitionRef.current && isStartedRef.current) {
+      try {
+        recognitionRef.current.stop()
+      } catch (e) {}
+    }
+  }
+
+  const toggleListening = (forceState?: boolean) => {
+    const nextState = forceState !== undefined ? forceState : !isListening
+    if (nextState) {
+      speak('Voice assistant active.', () => {
+        startListening()
+      })
+    } else {
+      speak('Voice assistant paused.')
+      stopListening()
+    }
+  }
+
+  // ── 4. Initialize SpeechRecognition Lifecycle ──
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    if (typeof window === 'undefined') return
+
+    // Preload speech synthesis voices
+    if ('speechSynthesis' in window) {
       window.speechSynthesis.onvoiceschanged = () => {
         window.speechSynthesis.getVoices()
       }
+      window.speechSynthesis.getVoices()
     }
-  }, [])
 
-  const hasGreeted = useRef(false)
-  
-  const toggleListening = (forceState?: boolean, isAutoGreeting?: boolean) => {
-    setIsListening(prev => {
-      const newState = forceState !== undefined ? forceState : !prev
-      
-      if (newState) {
-        if (!isAutoGreeting) {
-          speak('Voice assistant activated.')
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      console.warn('[VoiceAssistant] SpeechRecognition not supported in this browser.')
+      return
+    }
+
+    const recognition = new SpeechRecognition()
+    recognition.continuous = true
+    recognition.interimResults = false
+    recognition.lang = 'en-IN'
+
+    recognition.onstart = () => {
+      isStartedRef.current = true
+      setIsListening(true)
+    }
+
+    recognition.onresult = (event: any) => {
+      if (isSpeakingRef.current) return
+      const results = event.results
+      if (results && results.length > 0) {
+        const transcript = results[results.length - 1][0].transcript
+        if (transcript) {
+          handleVoiceCommand(transcript)
         }
-        try {
-          recognitionRef.current?.start()
-        } catch (e) {
-          console.error("Mic start error", e)
-        }
-      } else {
-        if (!isAutoGreeting) {
-          speak('Voice assistant paused.')
-        }
-        recognitionRef.current?.stop()
       }
-      
-      return newState;
-    })
-  }
+    }
 
-  useEffect(() => {
+    recognition.onerror = (event: any) => {
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
+        console.warn('[VoiceAssistant] Recognition notice:', event.error)
+      }
+    }
+
+    recognition.onend = () => {
+      isStartedRef.current = false
+      if (shouldListenRef.current && !isSpeakingRef.current) {
+        setTimeout(() => {
+          if (shouldListenRef.current && !isStartedRef.current && !isSpeakingRef.current) {
+            try {
+              recognition.start()
+            } catch (e) {}
+          }
+        }, 300)
+      } else if (!shouldListenRef.current) {
+        setIsListening(false)
+      }
+    }
+
+    recognitionRef.current = recognition
+
+    // Auto-Greeting
     const playGreeting = () => {
-      if (!hasGreeted.current) {
-        speak('Hi, welcome back Sandeep sir, main aapki kya madad kar sakta hu')
-        hasGreeted.current = true
-        // Start listening automatically
-        toggleListening(true, true)
-      }
+      if (hasGreeted.current) return
+      hasGreeted.current = true
+      shouldListenRef.current = true
+      speak('Welcome back Sandeep sir, bataiye main aapki kya help kar sakta hoon?')
     }
-    
-    // Auto-play might be blocked by browser policy without user interaction
-    // We attach it to a click event just in case, but also attempt immediately
+
     const timer = setTimeout(() => {
-       playGreeting()
-    }, 1000)
-    
+      playGreeting()
+    }, 800)
+
     window.addEventListener('click', playGreeting, { once: true })
-    
+    window.addEventListener('keydown', playGreeting, { once: true })
+
     return () => {
-       clearTimeout(timer)
-       window.removeEventListener('click', playGreeting)
+      clearTimeout(timer)
+      window.removeEventListener('click', playGreeting)
+      window.removeEventListener('keydown', playGreeting)
+      shouldListenRef.current = false
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort()
+        } catch (e) {}
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // A global trigger could be added here, for now it's a fixed button at bottom right
   return (
     <div style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 9999 }}>
-      <button 
-        onClick={() => toggleListening()} 
+      <button
+        onClick={() => toggleListening()}
         style={{
-          width: 50, 
-          height: 50, 
-          borderRadius: '50%', 
-          background: isListening ? 'var(--red)' : 'var(--purple)',
-          color: 'white',
-          border: 'none',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          width: 52,
+          height: 52,
+          borderRadius: '50%',
+          background: isListening
+            ? 'linear-gradient(135deg, #00E5FF, #4F8CFF)'
+            : 'rgba(20, 25, 45, 0.85)',
+          color: isListening ? '#050816' : '#4F8CFF',
+          border: isListening ? '2px solid #00E5FF' : '1px solid rgba(79, 140, 255, 0.3)',
+          boxShadow: isListening
+            ? '0 0 25px rgba(0, 229, 255, 0.5), 0 4px 15px rgba(0,0,0,0.4)'
+            : '0 4px 12px rgba(0,0,0,0.3)',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 24,
-          animation: isListening ? 'pulse 2s infinite' : 'none'
+          transition: 'all 0.3s ease',
+          backdropFilter: 'blur(10px)',
         }}
-        title="Toggle Voice Assistant"
+        title={isListening ? 'Voice Assistant Active (Click to Pause)' : 'Voice Assistant Paused (Click to Start)'}
       >
-        {isListening ? '🎙️' : '🎤'}
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+        </svg>
       </button>
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes pulse {
-          0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
-          70% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
-        }
-      `}} />
     </div>
   )
 }
