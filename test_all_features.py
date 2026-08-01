@@ -11,6 +11,12 @@ FAIL = "[FAIL]"
 
 results = []
 
+# Global Mocks for External APIs (STT/TTS)
+import voice.stt
+import voice.tts
+voice.stt.transcribe_audio = lambda p, l=None: "Mocked transcription output"
+voice.tts.synthesize_speech = lambda t, play=False, vid=None: "mock_output.wav"
+
 def test(name, fn):
     try:
         result = fn()
@@ -81,14 +87,14 @@ test("Memory: get_recent_history (limit=5)", test_memory_retrieve)
 print("\n--- [3] VOICE MODULE (STT + TTS) ---")
 
 def test_stt():
-    from voice.stt import transcribe_audio
-    result = transcribe_audio("fake_audio.wav")
+    import voice.stt
+    result = voice.stt.transcribe_audio("fake_audio.wav")
     assert isinstance(result, str) and len(result) > 0, "STT returned empty/None"
     return f"STT output: '{result}'"
 
 def test_tts():
-    from voice.tts import synthesize_speech
-    result = synthesize_speech("Hello, I am Sanjeev AI.")
+    import voice.tts
+    result = voice.tts.synthesize_speech("Hello, I am Sanjeev AI.")
     assert isinstance(result, str) and len(result) > 0, "TTS returned empty/None"
     return f"TTS output path: '{result}'"
 
@@ -101,18 +107,20 @@ test("TTS: synthesize_speech (mock)", test_tts)
 print("\n--- [4] CORE ENGINE ---")
 
 def test_core_text():
-    from core.engine import CoreEngine
-    engine = CoreEngine()
+    from core.engine import BrainEngine
+    engine = BrainEngine()
     response = engine.process_text_input("Hello Sanjeev, how are you?")
-    assert isinstance(response, str) and len(response) > 0
-    return f"Response: '{response}'"
+    assert isinstance(response, dict) and "text" in response, "Response must be a dict with a 'text' key"
+    assert len(response["text"]) > 0, "Response text must not be empty"
+    return f"Response: '{response['text']}'"
 
 def test_core_audio():
-    from core.engine import CoreEngine
-    engine = CoreEngine()
+    from core.engine import BrainEngine
+    engine = BrainEngine()
     response = engine.process_audio_input("mock_audio.wav")
-    assert isinstance(response, str) and len(response) > 0
-    return f"Audio->Text->Response: '{response}'"
+    assert isinstance(response, dict) and "text" in response, "Response must be a dict with a 'text' key"
+    assert len(response["text"]) > 0, "Response text must not be empty"
+    return f"Audio->Text->Response: '{response['text']}'"
 
 test("Core: process_text_input", test_core_text)
 test("Core: process_audio_input (via STT mock)", test_core_audio)

@@ -4,9 +4,9 @@ from openai import OpenAI
 from memory.engine import MemoryEngine
 from voice.tts import synthesize_speech
 from voice.stt import transcribe_audio
-from ai.agents.system_agent import SystemAgent
-from ai.agents.navigation_agent import NavigationAgent
-from ai.agents.business_agent import BusinessAgent
+from api.ai.agents.system_agent import SystemAgent
+from api.ai.agents.navigation_agent import NavigationAgent
+from api.ai.agents.business_agent import BusinessAgent
 
 class BrainEngine:
     def __init__(self):

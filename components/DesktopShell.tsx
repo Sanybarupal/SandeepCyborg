@@ -258,7 +258,7 @@ export function DesktopShell({ children }: { children: React.ReactNode }) {
           </button>
 
           {/* Theme (Desktop) */}
-          <button className="ds-nav-btn ds-desktop-only" title="Theme">
+          <button className="ds-nav-btn ds-desktop-only" title="Theme" onClick={() => document.documentElement.classList.toggle('light-theme')}>
             {Icons.moon}
           </button>
 

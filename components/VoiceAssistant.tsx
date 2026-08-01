@@ -44,8 +44,9 @@ export default function VoiceAssistant() {
   }, [isListening])
 
   const handleVoiceCommand = async (command: string) => {
-    if (command.includes('hi sandeep') || command.includes('hi saibo') || command.includes('hello sandeep')) {
-      speak('Hello sir. How can I assist you with your business today?')
+    const wakeWords = ['hey cybo', 'hey sandeep', 'hello sandeep', 'hello cybo', 'cybo', 'sandeep']
+    if (wakeWords.some(w => command.includes(w))) {
+      speak('haan main sun raha hu sir bataiye kya kaam hai')
       return
     }
     
@@ -71,38 +72,54 @@ export default function VoiceAssistant() {
       speak('Voice assistant paused')
       toggleListening(false)
     } else {
-      // Simulate passing to an LLM
       console.log('Sending to AI backend:', command)
-      // Normally, here we would fetch from our /api/chat backend.
-      // For now, if we don't recognize a command, we give a default AI response:
-      if (command.length > 5 && !command.includes('sandeep') && !command.includes('saibo')) {
-         speak('I am processing your request. Please wait.')
-         setTimeout(() => {
-            speak('I have recorded your command.')
-         }, 2000)
+      try {
+        const response = await fetch('http://localhost:8000/api/voice/command', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: command, speak: false }) // We'll handle TTS here
+        })
+        const data = await response.json()
+        if (data && data.text) {
+          speak(data.text)
+        } else {
+          speak('Command executed successfully.')
+        }
+      } catch (e) {
+        console.error('Failed to communicate with AI backend', e)
+        speak('Sorry, I could not reach the backend server.')
       }
     }
   }
 
   const speak = (text: string) => {
+    console.log('[VoiceAssistant] Speaking:', text);
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // Clear any stuck queues
       const utterance = new SpeechSynthesisUtterance(text)
       
-      // Try to find a more natural/human voice (e.g. Google or Microsoft natural voices)
       const voices = window.speechSynthesis.getVoices()
-      // Fallback to finding male English voices which tend to sound closer to the desired outcome
-      let selectedVoice = voices.find(v => v.name.includes('Google UK English Male') || v.name.includes('Google US English'))
+      
+      // Try to find a Hindi voice first for better Hinglish pronunciation
+      let selectedVoice = voices.find(v => v.lang.includes('hi-IN') || v.lang.includes('hi'))
+      
+      // Fallback to English natural voices if Hindi is not found
       if (!selectedVoice) {
-        selectedVoice = voices.find(v => v.name.includes('Natural') || v.name.includes('Neural'))
+         selectedVoice = voices.find(v => v.name.includes('Google UK English Male') || v.name.includes('Google US English') || v.name.includes('Natural') || v.name.includes('Neural'))
       }
       
       if (selectedVoice) {
         utterance.voice = selectedVoice
+        console.log('[VoiceAssistant] Selected Voice:', selectedVoice.name, selectedVoice.lang);
+      } else {
+        console.log('[VoiceAssistant] No specialized voice found. Using default.');
       }
 
-      utterance.rate = 1.05 // Slightly faster for natural feel
-      utterance.pitch = 0.9 // Slightly lower pitch for deeper male voice
+      utterance.rate = 1.0 // Normal rate
+      utterance.pitch = 1.0 // Normal pitch
       window.speechSynthesis.speak(utterance)
+    } else {
+      console.warn('[VoiceAssistant] Speech synthesis not supported in this environment.');
     }
   }
 
@@ -115,19 +132,56 @@ export default function VoiceAssistant() {
     }
   }, [])
 
-  const toggleListening = (forceState?: boolean) => {
-    const newState = forceState !== undefined ? forceState : !isListening
-    setIsListening(newState)
-    
-    if (newState) {
-      speak('Voice assistant ready, I am Sandeep Saibo.')
-      try {
-        recognitionRef.current?.start()
-      } catch (e) {}
-    } else {
-      recognitionRef.current?.stop()
-    }
+  const hasGreeted = useRef(false)
+  
+  const toggleListening = (forceState?: boolean, isAutoGreeting?: boolean) => {
+    setIsListening(prev => {
+      const newState = forceState !== undefined ? forceState : !prev
+      
+      if (newState) {
+        if (!isAutoGreeting) {
+          speak('Voice assistant activated.')
+        }
+        try {
+          recognitionRef.current?.start()
+        } catch (e) {
+          console.error("Mic start error", e)
+        }
+      } else {
+        if (!isAutoGreeting) {
+          speak('Voice assistant paused.')
+        }
+        recognitionRef.current?.stop()
+      }
+      
+      return newState;
+    })
   }
+
+  useEffect(() => {
+    const playGreeting = () => {
+      if (!hasGreeted.current) {
+        speak('Hi, welcome back Sandeep sir, main aapki kya madad kar sakta hu')
+        hasGreeted.current = true
+        // Start listening automatically
+        toggleListening(true, true)
+      }
+    }
+    
+    // Auto-play might be blocked by browser policy without user interaction
+    // We attach it to a click event just in case, but also attempt immediately
+    const timer = setTimeout(() => {
+       playGreeting()
+    }, 1000)
+    
+    window.addEventListener('click', playGreeting, { once: true })
+    
+    return () => {
+       clearTimeout(timer)
+       window.removeEventListener('click', playGreeting)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // A global trigger could be added here, for now it's a fixed button at bottom right
   return (

@@ -25,23 +25,31 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
 
       {/* Top Header */}
       <header className="ds-navbar premium-top-nav" style={{ padding: '0 20px', height: '70px', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="ds-sb-logo ds-mobile-logo" style={{ padding: 0, border: 'none', minHeight: 'auto' }}>
-          <div className="ds-sb-logo-icon">{Icons.bolt}</div>
-          <div className="ds-sb-logo-text">
-            <span className="ds-sb-logo-name" style={{ fontSize: '18px' }}>Hi, Sandeep</span>
-            <span className="ds-sb-logo-badge">AI ONLINE</span>
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Link href="/settings" className="ds-nav-btn" style={{ padding: '8px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: 'var(--text)' }}>
+            {Icons.menu}
+          </Link>
+          <Link href="/" className="ds-sb-logo ds-mobile-logo" style={{ padding: 0, border: 'none', minHeight: 'auto', textDecoration: 'none' }}>
+            <div className="ds-sb-logo-icon">{Icons.bolt}</div>
+            <div className="ds-sb-logo-text">
+              <span className="ds-sb-logo-name" style={{ fontSize: '18px' }}>Hi, Sandeep</span>
+              <span className="ds-sb-logo-badge">AI ONLINE</span>
+            </div>
+          </Link>
         </div>
         
         <div className="ds-nav-right">
-          <button className="ds-nav-btn ds-nav-btn-notif">
+          <button className="ds-nav-btn" title="Theme" onClick={() => document.documentElement.classList.toggle('light-theme')}>
+            {Icons.moon}
+          </button>
+          <Link href="/settings" className="ds-nav-btn ds-nav-btn-notif">
             {Icons.bell}
             <span className="ds-nav-notif-dot">3</span>
-          </button>
-          <div className="ds-nav-profile">
+          </Link>
+          <Link href="/settings" className="ds-nav-profile">
             <img src="https://ui-avatars.com/api/?name=Sandeep+Kumar&background=4F8CFF&color=fff&size=36" alt="" />
             <div className="ds-nav-profile-dot" />
-          </div>
+          </Link>
         </div>
       </header>
 

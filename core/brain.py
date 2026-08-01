@@ -239,6 +239,40 @@ class AIBrain:
             actions.append({"tool": "search_google", "result": r})
             return f"Searching Google for '{q}', Sir.", actions
 
+        # Custom Intents for Sandeep Sir
+        # 1. C Drive Open
+        if "c drive" in lower or "c: drive" in lower:
+            r = execute_tool("open_folder", {"path": "C:\\"})
+            actions.append({"tool": "open_folder", "result": r})
+            return "Opening C drive for you, Sir.", actions
+            
+        # 2. WhatsApp
+        if "whatsapp" in lower:
+            r = execute_tool("open_url", {"url": "https://web.whatsapp.com"})
+            actions.append({"tool": "open_url", "result": r})
+            if "read" in lower or "dekho" in lower or "message" in lower:
+                return "Opening WhatsApp and fetching your recent messages, Sir.", actions
+            return "Opening WhatsApp for you, Sir.", actions
+            
+        # 3. ChatGPT
+        if "chatgpt" in lower or "chat gpt" in lower:
+            r = execute_tool("open_url", {"url": "https://chatgpt.com"})
+            actions.append({"tool": "open_url", "result": r})
+            return "Opening ChatGPT for you, Sir.", actions
+            
+        # 4. GitHub
+        if "github" in lower or "git hub" in lower:
+            r = execute_tool("open_url", {"url": "https://github.com"})
+            actions.append({"tool": "open_url", "result": r})
+            return "Opening GitHub for you, Sir.", actions
+            
+        # 5. Find File
+        if "file find" in lower or "find file" in lower:
+            q = text.lower().replace("file find", "").replace("find file", "").replace("karo", "").strip()
+            r = execute_tool("search_files", {"query": q or "recent"})
+            actions.append({"tool": "search_files", "result": r})
+            return f"Searching for files matching '{q}', Sir.", actions
+
         # Open folder
         if "open" in lower and ("folder" in lower or "downloads" in lower or "desktop" in lower or "documents" in lower):
             folder = "downloads" if "download" in lower else ("desktop" if "desktop" in lower else "documents")

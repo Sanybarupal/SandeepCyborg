@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { DesktopShell } from '../components/DesktopShell'
 import { MobileShell } from '../components/MobileShell'
+import VoiceAssistant from '../components/VoiceAssistant'
 
 export const metadata: Metadata = {
   title: 'Sandeep Clone — AI Operating System',
@@ -27,6 +28,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#050816" />
       </head>
       <body>
+        <VoiceAssistant />
         <DesktopShell>
           {children}
         </DesktopShell>
