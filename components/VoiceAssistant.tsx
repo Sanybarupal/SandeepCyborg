@@ -107,6 +107,19 @@ export default function VoiceAssistant() {
       return
     }
 
+    // Native App Commands
+    if (command.includes('whatsapp open karo') || command.includes('open real whatsapp') || command.includes('start whatsapp')) {
+      speak('Haan sir, WhatsApp open ho gaya hai.')
+      fetch('/api/system/open', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ appName: 'whatsapp' }) }).catch(e => console.error(e))
+      return
+    }
+
+    if (command.includes('notepad open karo') || command.includes('open notepad') || command.includes('notepad kholo')) {
+      speak('Haan sir, Notepad open ho gaya hai.')
+      fetch('/api/system/open', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ appName: 'notepad' }) }).catch(e => console.error(e))
+      return
+    }
+
     // Navigation Commands
     if (command.includes('open dashboard') || command.includes('dashboard kholo') || command.includes('go home') || command.includes('home page')) {
       speak('Opening Dashboard')
